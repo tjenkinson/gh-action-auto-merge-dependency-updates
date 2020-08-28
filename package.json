@@ -1,0 +1,40 @@
+{
+  "name": "gh-action-auto-merge-dependency-updates",
+  "version": "0.0.0",
+  "private": true,
+  "description": "A GitHub action that will automatically merge a PR that only contains dependency updates, based on some rules.",
+  "scripts": {
+    "build": "rm -rf dist && rollup --config rollup.config.js",
+    "watch": "rollup --config rollup.config.js --watch",
+    "prettier": "prettier --write .",
+    "lint": "prettier --check ."
+  },
+  "hooks": {
+    "pre-commit": "npm run prettier"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tjenkinson/gh-action-auto-merge-dependency-updates.git"
+  },
+  "author": "Tom Jenkinson <tom@tjenkinson.me>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tjenkinson/gh-action-auto-merge-dependency-updates/issues"
+  },
+  "homepage": "https://github.com/tjenkinson/gh-action-auto-merge-dependency-updates#readme",
+  "devDependencies": {
+    "@actions/core": "^1.2.5",
+    "@actions/github": "^4.0.0",
+    "@rollup/plugin-commonjs": "^15.0.0",
+    "@rollup/plugin-node-resolve": "^9.0.0",
+    "@types/semver": "^7.3.3",
+    "deep-object-diff": "^1.1.0",
+    "husky": "^4.2.5",
+    "prettier": "^2.1.1",
+    "rollup": "^2.7.2",
+    "rollup-plugin-typescript2": "^0.27.2",
+    "semver": "^7.3.2",
+    "tslib": "^2.0.1",
+    "typescript": "^4.0.2"
+  }
+}
