@@ -7870,6 +7870,7 @@ function run() {
                         .split(',')
                         .map(function (a) { return a.trim(); });
                     context = github.context;
+                    core.debug(JSON.stringify(context, null, 2));
                     pr = context.payload.pull_request;
                     if (!pr) {
                         core.error('Not a PR');
@@ -7914,7 +7915,9 @@ function run() {
                                                 case 1:
                                                     prData = _a.sent();
                                                     if (prData.data.merge_commit_sha !== expectedSha) {
-                                                        core.error("Commit is old. " + prData.data.merge_commit_sha + " !== " + expectedSha);
+                                                        core.error(
+                                                        // TODO this breaks when something else merged in and branch not up to date?
+                                                        "Commit is old. " + prData.data.merge_commit_sha + " !== " + expectedSha);
                                                         return [2 /*return*/, { value: void 0 }];
                                                     }
                                                     if (prData.data.state !== 'open') {

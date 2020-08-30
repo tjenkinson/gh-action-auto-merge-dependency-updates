@@ -42,6 +42,7 @@ export async function run(): Promise<void> {
     .map((a) => a.trim());
 
   const context = github.context;
+  core.debug(JSON.stringify(context, null, 2));
   const pr = context.payload.pull_request;
   if (!pr) {
     core.error('Not a PR');
@@ -76,6 +77,7 @@ export async function run(): Promise<void> {
       const prData = await getPR();
       if (prData.data.merge_commit_sha !== expectedSha) {
         core.error(
+          // TODO this breaks when something else merged in and branch not up to date?
           `Commit is old. ${prData.data.merge_commit_sha} !== ${expectedSha}`
         );
         return;
