@@ -7922,34 +7922,41 @@ function run() {
                                                         return [2 /*return*/, { value: void 0 }];
                                                     }
                                                     mergeable = prData.data.mergeable;
-                                                    if (!!mergeable) return [3 /*break*/, 3];
-                                                    core.error("Not mergeable yet. Retry in " + retryDelays[i] + " ms");
-                                                    return [4 /*yield*/, new Promise(function (resolve) {
-                                                            return setTimeout(function () { return resolve(); }, retryDelays[i]);
-                                                        })];
+                                                    if (!mergeable) return [3 /*break*/, 6];
+                                                    _a.label = 2;
                                                 case 2:
-                                                    _a.sent();
-                                                    return [2 /*return*/, "continue"];
-                                                case 3:
-                                                    _a.trys.push([3, 5, , 6]);
-                                                    core.info('Merging');
+                                                    _a.trys.push([2, 4, , 5]);
+                                                    core.info('Attempting merge');
                                                     return [4 /*yield*/, octokit.pulls.merge({
                                                             owner: context.repo.owner,
                                                             repo: context.repo.repo,
                                                             pull_number: pr.number,
                                                             sha: prData.data.head.sha,
                                                         })];
-                                                case 4:
+                                                case 3:
                                                     _a.sent();
-                                                    return [3 /*break*/, 6];
-                                                case 5:
+                                                    core.info('Merged');
+                                                    return [2 /*return*/, { value: void 0 }];
+                                                case 4:
                                                     e_1 = _a.sent();
                                                     if (e_1.status && e_1.status === 409) {
                                                         core.error('Failed to merge. PR head changed');
                                                         return [2 /*return*/, { value: void 0 }];
                                                     }
-                                                    throw e_1;
-                                                case 6: return [2 /*return*/, { value: void 0 }];
+                                                    core.error("Merge failed: " + e_1);
+                                                    return [3 /*break*/, 5];
+                                                case 5: return [3 /*break*/, 7];
+                                                case 6:
+                                                    core.error('Not mergeable yet');
+                                                    _a.label = 7;
+                                                case 7:
+                                                    core.info("Retry in " + retryDelays[i] + " ms");
+                                                    return [4 /*yield*/, new Promise(function (resolve) {
+                                                            return setTimeout(function () { return resolve(); }, retryDelays[i]);
+                                                        })];
+                                                case 8:
+                                                    _a.sent();
+                                                    return [2 /*return*/];
                                             }
                                         });
                                     };

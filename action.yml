@@ -1,5 +1,5 @@
 name: 'Auto Merge'
-description: 'TODO'
+description: 'Automatically merge a PR that only contains dependency updates, based on some rules.'
 author: 'Tom Jenkinson'
 inputs:
   repo-token:
