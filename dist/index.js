@@ -7839,7 +7839,7 @@ var semverRegex = /^([~^]?)[0-9]+\.[0-9]+\.[0-9]+(-.+)?$/;
 var retryDelays = [1, 1, 1, 2, 3, 4, 5, 10, 20, 40, 60, 60, 60, 120].map(function (a) { return a * 1000; });
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var myToken, allowedActors, allowedUpdateTypes, packageBlockList, octokit, context, pr, readPackageJson, mergeWhenPossible, getCommit, getPR, validVersionChange, commit, onlyPackageJsonChanged, base, packageJsonBase, packageJsonPr, diff, allowedChange;
+        var myToken, allowedActors, allowedUpdateTypes, packageBlockList, context, pr, octokit, readPackageJson, mergeWhenPossible, getCommit, getPR, validVersionChange, commit, onlyPackageJsonChanged, base, packageJsonBase, packageJsonPr, diff, allowedChange;
         var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -7869,7 +7869,6 @@ function run() {
                     packageBlockList = (core.getInput('package-block-list') || '')
                         .split(',')
                         .map(function (a) { return a.trim(); });
-                    octokit = github.getOctokit(myToken);
                     context = github.context;
                     pr = context.payload.pull_request;
                     if (!pr) {
@@ -7880,6 +7879,7 @@ function run() {
                         core.error("Actor not allowed: " + context.actor);
                         return [2 /*return*/];
                     }
+                    octokit = github.getOctokit(myToken);
                     readPackageJson = function (ref) { return __awaiter(_this, void 0, void 0, function () {
                         var content;
                         return __generator(this, function (_a) {

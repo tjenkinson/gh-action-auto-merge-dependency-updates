@@ -41,8 +41,6 @@ export async function run(): Promise<void> {
     .split(',')
     .map((a) => a.trim());
 
-  const octokit = github.getOctokit(myToken);
-
   const context = github.context;
   const pr = context.payload.pull_request;
   if (!pr) {
@@ -54,6 +52,8 @@ export async function run(): Promise<void> {
     core.error(`Actor not allowed: ${context.actor}`);
     return;
   }
+
+  const octokit = github.getOctokit(myToken);
 
   const readPackageJson = async (ref: string): Promise<Record<string, any>> => {
     const content = await octokit.repos.getContent({
