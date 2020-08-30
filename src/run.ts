@@ -85,29 +85,32 @@ export async function run(): Promise<void> {
         return;
       }
       const mergeable = prData.data.mergeable;
-      if (!mergeable) {
-        core.error(`Not mergeable yet. Retry in ${retryDelays[i]} ms`);
-        await new Promise((resolve) =>
-          setTimeout(() => resolve(), retryDelays[i])
-        );
-        continue;
-      }
-      try {
-        core.info('Merging');
-        await octokit.pulls.merge({
-          owner: context.repo.owner,
-          repo: context.repo.repo,
-          pull_number: pr.number,
-          sha: prData.data.head.sha,
-        });
-      } catch (e) {
-        if (e.status && e.status === 409) {
-          core.error('Failed to merge. PR head changed');
+      if (mergeable) {
+        try {
+          core.info('Attempting merge');
+          await octokit.pulls.merge({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: pr.number,
+            sha: prData.data.head.sha,
+          });
+          core.info('Merged');
           return;
+        } catch (e) {
+          if (e.status && e.status === 409) {
+            core.error('Failed to merge. PR head changed');
+            return;
+          }
+          core.error(`Merge failed: ${e}`);
         }
-        throw e;
+      } else {
+        core.error('Not mergeable yet');
       }
-      return;
+
+      core.info(`Retry in ${retryDelays[i]} ms`);
+      await new Promise((resolve) =>
+        setTimeout(() => resolve(), retryDelays[i])
+      );
     }
     throw new Error('Ran out of retries');
   };
