@@ -30,5 +30,5 @@ jobs:
       - uses: tjenkinson/gh-action-auto-merge-dependency-updates@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          allowed-actors: dependabot-preview
+          allowed-actors: dependabot-preview[bot]
 ```

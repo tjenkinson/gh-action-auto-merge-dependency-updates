@@ -14,4 +14,4 @@ jobs:
       - uses: ./
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          allowed-actors: tjenkinson
+          allowed-actors: tjenkinson, dependabot-preview[bot]
