@@ -19,9 +19,8 @@ You should configure this action to run on the `pull_request` `opened` and `sync
 name: Auto Merge Dependency Updates
 
 on:
-  pull_request:
-    types: [opened, synchronize]
-  pull_request_review:
+  - pull_request
+  - pull_request_review
 
 jobs:
   run:

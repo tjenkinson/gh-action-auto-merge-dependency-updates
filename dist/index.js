@@ -5611,7 +5611,7 @@ exports.getOctokit = getOctokit;
 
 var utils$2 = createCommonjsModule(function (module, exports) {
 (function (global, factory) {
-  {
+  var mod; {
     factory(exports);
   }
 })(commonjsGlobal, function (exports) {
@@ -5657,7 +5657,7 @@ var utils$2 = createCommonjsModule(function (module, exports) {
 
 var diff = createCommonjsModule(function (module, exports) {
 (function (global, factory) {
-  {
+  var mod; {
     factory(module, exports, utils$2);
   }
 })(commonjsGlobal, function (module, exports, _utils) {
@@ -5730,7 +5730,7 @@ var diff = createCommonjsModule(function (module, exports) {
 
 var added = createCommonjsModule(function (module, exports) {
 (function (global, factory) {
-  {
+  var mod; {
     factory(module, exports, utils$2);
   }
 })(commonjsGlobal, function (module, exports, _utils) {
@@ -5795,7 +5795,7 @@ var added = createCommonjsModule(function (module, exports) {
 
 var deleted = createCommonjsModule(function (module, exports) {
 (function (global, factory) {
-  {
+  var mod; {
     factory(module, exports, utils$2);
   }
 })(commonjsGlobal, function (module, exports, _utils) {
@@ -5859,7 +5859,7 @@ var deleted = createCommonjsModule(function (module, exports) {
 
 var updated = createCommonjsModule(function (module, exports) {
 (function (global, factory) {
-  {
+  var mod; {
     factory(module, exports, utils$2);
   }
 })(commonjsGlobal, function (module, exports, _utils) {
@@ -5932,7 +5932,7 @@ var updated = createCommonjsModule(function (module, exports) {
 
 var detailed = createCommonjsModule(function (module, exports) {
 (function (global, factory) {
-  {
+  var mod; {
     factory(module, exports, added, deleted, updated);
   }
 })(commonjsGlobal, function (module, exports, _added, _deleted, _updated) {
@@ -5968,7 +5968,7 @@ var detailed = createCommonjsModule(function (module, exports) {
 
 var dist = createCommonjsModule(function (module, exports) {
 (function (global, factory) {
-  {
+  var mod; {
     factory(exports, diff, added, deleted, updated, detailed);
   }
 })(commonjsGlobal, function (exports, _diff, _added, _deleted, _updated, _detailed) {
@@ -7914,7 +7914,7 @@ function run() {
                                                 case 1:
                                                     prData = _a.sent();
                                                     if (prData.data.merge_commit_sha !== expectedSha) {
-                                                        core.error("Commit is old. " + prData.data.merge_commit_sha + " !== " + expectedSha);
+                                                        core.error("PR changed. " + prData.data.merge_commit_sha + " !== " + expectedSha);
                                                         return [2 /*return*/, { value: void 0 }];
                                                     }
                                                     if (prData.data.state !== 'open') {
@@ -7973,7 +7973,9 @@ function run() {
                                 case 3:
                                     i++;
                                     return [3 /*break*/, 1];
-                                case 4: throw new Error('Ran out of retries');
+                                case 4:
+                                    core.error('Ran out of retries');
+                                    return [2 /*return*/];
                             }
                         });
                     }); };

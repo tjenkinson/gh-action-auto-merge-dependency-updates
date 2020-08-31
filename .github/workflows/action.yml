@@ -1,9 +1,8 @@
 name: Test Action
 
 on:
-  pull_request:
-    types: [opened, synchronize]
-  pull_request_review:
+  - pull_request
+  - pull_request_review
 
 jobs:
   run:

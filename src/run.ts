@@ -76,7 +76,7 @@ export async function run(): Promise<void> {
       const prData = await getPR();
       if (prData.data.merge_commit_sha !== expectedSha) {
         core.error(
-          `Commit is old. ${prData.data.merge_commit_sha} !== ${expectedSha}`
+          `PR changed. ${prData.data.merge_commit_sha} !== ${expectedSha}`
         );
         return;
       }
@@ -112,7 +112,7 @@ export async function run(): Promise<void> {
         setTimeout(() => resolve(), retryDelays[i])
       );
     }
-    throw new Error('Ran out of retries');
+    core.error('Ran out of retries');
   };
 
   const getCommit = () =>
