@@ -8,7 +8,7 @@ If you run tests on PR's make sure you [configure those as required status check
 
 - `repo-token`: a GitHub API token. E.g. `${{ secrets.GITHUB_TOKEN }}`
 - `allowed-actors`: A comma separated list of usernames auto merge is allowed for.
-- `allowed-update-types` (optional): A comma separated list of types of updates that are allowed. Supported: [devDependencies|dependencies]:[major|minor|patch]. _Default: `devDependencies:minor, devDependencies:patch`_
+- `allowed-update-types` (optional): A comma separated list of types of updates that are allowed. Supported: [devDependencies|dependencies]:[major|minor|patch]. _Default: `devDependencies:minor, devDependencies:patch, dependencies:minor, dependencies:patch`_
 - `package-block-list` (optional): A comma separated list of packages that auto merge should not be allowed for.
 
 You should configure this action to run on the `pull_request` `opened` and `synchronize` events, and `pull_request_review`.

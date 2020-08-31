@@ -10,7 +10,7 @@ inputs:
     description: 'Comma separated list of usernames auto merge is allowed for'
   allowed-update-types:
     description: 'Comma separated list of types of updates that are allowed. Supported: [devDependencies|dependencies]:[major|minor|patch]'
-    default: 'devDependencies:minor, devDependencies:patch'
+    default: 'devDependencies:minor, devDependencies:patch, dependencies:minor, dependencies:patch'
   package-block-list:
     required: false
     description: 'Comma separated list of packages that auto merge should not be allowed for'
