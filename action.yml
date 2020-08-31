@@ -18,5 +18,5 @@ runs:
   using: 'node12'
   main: 'dist/index.js'
 branding:
-  color: blue
-  icon: git-merge
+  icon: 'git-merge'
+  color: 'blue'
