@@ -7837,15 +7837,25 @@ var semver$1 = {
 
 var semverRegex = /^([~^]?)[0-9]+\.[0-9]+\.[0-9]+(-.+)?$/;
 var retryDelays = [1, 1, 1, 2, 3, 4, 5, 10, 20, 40, 60, 60, 60, 120].map(function (a) { return a * 1000; });
+function isWantedPayload(payload) {
+    return ['pull_request', 'pull_request_review'].includes(payload.eventName);
+}
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var myToken, allowedActors, allowedUpdateTypes, packageBlockList, context, pr, octokit, readPackageJson, mergeWhenPossible, getCommit, getPR, validVersionChange, commit, onlyPackageJsonChanged, base, packageJsonBase, packageJsonPr, diff, allowedChange;
+        var context, payload, token, allowedActors, allowedUpdateTypes, packageBlockList, pr, octokit, readPackageJson, mergeWhenPossible, getCommit, getPR, validVersionChange, commit, onlyPackageJsonChanged, base, packageJsonBase, packageJsonPr, diff, allowedChange;
         var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     core.info('Starting');
-                    myToken = core.getInput('repo-token', { required: true });
+                    context = github.context;
+                    core.debug(JSON.stringify(context, null, 2));
+                    payload = github.context.payload;
+                    if (!isWantedPayload(payload)) {
+                        core.error("Unsupported event name: " + payload.eventName);
+                        return [2 /*return*/];
+                    }
+                    token = core.getInput('repo-token', { required: true });
                     allowedActors = core.getInput('allowed-actors', { required: true })
                         .split(',')
                         .map(function (a) { return a.trim(); });
@@ -7869,17 +7879,12 @@ function run() {
                     packageBlockList = (core.getInput('package-block-list') || '')
                         .split(',')
                         .map(function (a) { return a.trim(); });
-                    context = github.context;
-                    pr = context.payload.pull_request;
-                    if (!pr) {
-                        core.error('Not a PR');
-                        return [2 /*return*/];
-                    }
+                    pr = payload.pull_request;
                     if (!allowedActors.includes(context.actor)) {
                         core.error("Actor not allowed: " + context.actor);
                         return [2 /*return*/];
                     }
-                    octokit = github.getOctokit(myToken);
+                    octokit = github.getOctokit(token);
                     readPackageJson = function (ref) { return __awaiter(_this, void 0, void 0, function () {
                         var content;
                         return __generator(this, function (_a) {
@@ -7987,21 +7992,13 @@ function run() {
                             ref: context.ref,
                         });
                     };
-                    getPR = function () { return __awaiter(_this, void 0, void 0, function () {
-                        var prData;
-                        return __generator(this, function (_a) {
-                            switch (_a.label) {
-                                case 0: return [4 /*yield*/, octokit.pulls.get({
-                                        owner: context.repo.owner,
-                                        repo: context.repo.repo,
-                                        pull_number: pr.number,
-                                    })];
-                                case 1:
-                                    prData = _a.sent();
-                                    return [2 /*return*/, prData];
-                            }
+                    getPR = function () {
+                        return octokit.pulls.get({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            pull_number: pr.number,
                         });
-                    }); };
+                    };
                     validVersionChange = function (oldVersion, newVersion, allowedBumpTypes) {
                         var oldVersionMatches = semverRegex.exec(oldVersion);
                         if (!oldVersionMatches) {
@@ -8047,15 +8044,13 @@ function run() {
                         return [2 /*return*/];
                     }
                     core.info('Getting base');
-                    return [4 /*yield*/, getPR()];
-                case 2:
-                    base = (_a.sent()).data.base;
+                    base = pr.base;
                     core.info('Retrieving package.json');
                     return [4 /*yield*/, readPackageJson(base.ref)];
-                case 3:
+                case 2:
                     packageJsonBase = _a.sent();
                     return [4 /*yield*/, readPackageJson(context.ref)];
-                case 4:
+                case 3:
                     packageJsonPr = _a.sent();
                     core.info('Calculating diff');
                     diff = dist.detailedDiff(packageJsonBase, packageJsonPr);
@@ -8096,7 +8091,7 @@ function run() {
                     }
                     core.info('Merging when possible');
                     return [4 /*yield*/, mergeWhenPossible(context.sha)];
-                case 5:
+                case 4:
                     _a.sent();
                     core.info('Finished!');
                     return [2 /*return*/];
