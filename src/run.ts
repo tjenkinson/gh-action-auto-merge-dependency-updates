@@ -1,5 +1,6 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
+import * as Webhooks from '@octokit/webhooks';
 import { detailedDiff } from 'deep-object-diff';
 import semver from 'semver';
 
@@ -8,10 +9,27 @@ const retryDelays = [1, 1, 1, 2, 3, 4, 5, 10, 20, 40, 60, 60, 60, 120].map(
   (a) => a * 1000
 );
 
+function isWantedPayload(
+  payload: any
+): payload is
+  | Webhooks.EventPayloads.WebhookPayloadPullRequest
+  | Webhooks.EventPayloads.WebhookPayloadPullRequestReview {
+  return ['pull_request', 'pull_request_review'].includes(payload.eventName);
+}
+
 export async function run(): Promise<void> {
   core.info('Starting');
 
-  const myToken = core.getInput('repo-token', { required: true });
+  const context = github.context;
+  core.debug(JSON.stringify(context, null, 2));
+
+  const payload = github.context.payload;
+  if (!isWantedPayload(payload)) {
+    core.error(`Unsupported event name: ${payload.eventName}`);
+    return;
+  }
+
+  const token = core.getInput('repo-token', { required: true });
 
   const allowedActors = core
     .getInput('allowed-actors', { required: true })
@@ -41,19 +59,14 @@ export async function run(): Promise<void> {
     .split(',')
     .map((a) => a.trim());
 
-  const context = github.context;
-  const pr = context.payload.pull_request;
-  if (!pr) {
-    core.error('Not a PR');
-    return;
-  }
+  const pr = payload.pull_request;
 
   if (!allowedActors.includes(context.actor)) {
     core.error(`Actor not allowed: ${context.actor}`);
     return;
   }
 
-  const octokit = github.getOctokit(myToken);
+  const octokit = github.getOctokit(token);
 
   const readPackageJson = async (ref: string): Promise<Record<string, any>> => {
     const content = await octokit.repos.getContent({
@@ -124,14 +137,12 @@ export async function run(): Promise<void> {
       ref: context.ref,
     });
 
-  const getPR = async () => {
-    const prData = await octokit.pulls.get({
+  const getPR = () =>
+    octokit.pulls.get({
       owner: context.repo.owner,
       repo: context.repo.repo,
       pull_number: pr.number,
     });
-    return prData;
-  };
 
   const validVersionChange = (
     oldVersion: string,
@@ -185,7 +196,7 @@ export async function run(): Promise<void> {
   }
 
   core.info('Getting base');
-  const base = (await getPR()).data.base;
+  const base = pr.base;
 
   core.info('Retrieving package.json');
   const packageJsonBase = await readPackageJson(base.ref);
