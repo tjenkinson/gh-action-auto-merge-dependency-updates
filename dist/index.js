@@ -7837,9 +7837,6 @@ var semver$1 = {
 
 var semverRegex = /^([~^]?)[0-9]+\.[0-9]+\.[0-9]+(-.+)?$/;
 var retryDelays = [1, 1, 1, 2, 3, 4, 5, 10, 20, 40, 60, 60, 60, 120].map(function (a) { return a * 1000; });
-function isWantedPayload(payload) {
-    return ['pull_request', 'pull_request_review'].includes(payload.eventName);
-}
 function run() {
     return __awaiter(this, void 0, void 0, function () {
         var context, payload, token, allowedActors, allowedUpdateTypes, packageBlockList, pr, octokit, readPackageJson, mergeWhenPossible, getCommit, getPR, validVersionChange, commit, onlyPackageJsonChanged, base, packageJsonBase, packageJsonPr, diff, allowedChange;
@@ -7850,11 +7847,12 @@ function run() {
                     core.info('Starting');
                     context = github.context;
                     core.debug(JSON.stringify(context, null, 2));
-                    payload = github.context.payload;
-                    if (!isWantedPayload(payload)) {
-                        core.error("Unsupported event name: " + payload.eventName);
+                    if (!['pull_request', 'pull_request_review'].includes(github.context.eventName)) {
+                        core.error("Unsupported event name: " + github.context.eventName);
                         return [2 /*return*/];
                     }
+                    payload = github.context
+                        .payload;
                     token = core.getInput('repo-token', { required: true });
                     allowedActors = core.getInput('allowed-actors', { required: true })
                         .split(',')
