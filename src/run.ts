@@ -93,6 +93,8 @@ export async function run(): Promise<void> {
             repo: context.repo.repo,
             pull_number: pr.number,
             sha: prData.data.head.sha,
+            commit_message:
+              'Merged by [tjenkinson/gh-action-auto-merge-dependency-updates](https://github.com/tjenkinson/gh-action-auto-merge-dependency-updates)',
           });
           core.info('Merged');
           return;
