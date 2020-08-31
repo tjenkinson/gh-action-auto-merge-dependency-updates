@@ -14,3 +14,4 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           allowed-actors: tjenkinson, dependabot-preview[bot]
+          package-block-list: '@actions/core, @actions/github'
