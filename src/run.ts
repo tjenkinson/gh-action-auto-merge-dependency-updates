@@ -9,25 +9,22 @@ const retryDelays = [1, 1, 1, 2, 3, 4, 5, 10, 20, 40, 60, 60, 60, 120].map(
   (a) => a * 1000
 );
 
-function isWantedPayload(
-  payload: any
-): payload is
-  | Webhooks.EventPayloads.WebhookPayloadPullRequest
-  | Webhooks.EventPayloads.WebhookPayloadPullRequestReview {
-  return ['pull_request', 'pull_request_review'].includes(payload.eventName);
-}
-
 export async function run(): Promise<void> {
   core.info('Starting');
 
   const context = github.context;
   core.debug(JSON.stringify(context, null, 2));
 
-  const payload = github.context.payload;
-  if (!isWantedPayload(payload)) {
-    core.error(`Unsupported event name: ${payload.eventName}`);
+  if (
+    !['pull_request', 'pull_request_review'].includes(github.context.eventName)
+  ) {
+    core.error(`Unsupported event name: ${github.context.eventName}`);
     return;
   }
+  const payload:
+    | Webhooks.EventPayloads.WebhookPayloadPullRequest
+    | Webhooks.EventPayloads.WebhookPayloadPullRequestReview = github.context
+    .payload as any;
 
   const token = core.getInput('repo-token', { required: true });
 
