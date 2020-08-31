@@ -1,4 +1,4 @@
-name: 'Auto Merge'
+name: 'Auto Merge Dependency Updates'
 description: 'Automatically merge a PR that only contains dependency updates, based on some rules.'
 author: 'Tom Jenkinson'
 inputs:
