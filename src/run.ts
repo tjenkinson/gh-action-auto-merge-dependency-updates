@@ -80,16 +80,10 @@ export async function run(): Promise<void> {
     );
   };
 
-  const mergeWhenPossible = async (expectedSha: string): Promise<void> => {
+  const mergeWhenPossible = async (): Promise<void> => {
     for (let i = 0; i < retryDelays.length; i++) {
       core.info(`Attempt: ${i}`);
       const prData = await getPR();
-      if (prData.data.merge_commit_sha !== expectedSha) {
-        core.error(
-          `PR changed. ${prData.data.merge_commit_sha} !== ${expectedSha}`
-        );
-        return;
-      }
       if (prData.data.state !== 'open') {
         core.error('PR is not open');
         return;
@@ -245,6 +239,6 @@ export async function run(): Promise<void> {
   }
 
   core.info('Merging when possible');
-  await mergeWhenPossible(context.sha);
+  await mergeWhenPossible();
   core.info('Finished!');
 }
