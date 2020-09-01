@@ -7902,7 +7902,7 @@ function run() {
                             }
                         });
                     }); };
-                    mergeWhenPossible = function (expectedSha) { return __awaiter(_this, void 0, void 0, function () {
+                    mergeWhenPossible = function () { return __awaiter(_this, void 0, void 0, function () {
                         var _loop_1, i, state_1;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
@@ -7916,10 +7916,6 @@ function run() {
                                                     return [4 /*yield*/, getPR()];
                                                 case 1:
                                                     prData = _a.sent();
-                                                    if (prData.data.merge_commit_sha !== expectedSha) {
-                                                        core.error("PR changed. " + prData.data.merge_commit_sha + " !== " + expectedSha);
-                                                        return [2 /*return*/, { value: void 0 }];
-                                                    }
                                                     if (prData.data.state !== 'open') {
                                                         core.error('PR is not open');
                                                         return [2 /*return*/, { value: void 0 }];
@@ -8088,7 +8084,7 @@ function run() {
                         return [2 /*return*/];
                     }
                     core.info('Merging when possible');
-                    return [4 /*yield*/, mergeWhenPossible(context.sha)];
+                    return [4 /*yield*/, mergeWhenPossible()];
                 case 4:
                     _a.sent();
                     core.info('Finished!');
