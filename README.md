@@ -4,6 +4,8 @@ A GitHub action that will automatically merge a PR that only contains dependency
 
 If you run tests on PR's make sure you [configure those as required status checks](https://docs.github.com/en/github/administering-a-repository/enabling-required-status-checks) so that they need to go green before the merge can occur.
 
+Note that the action does not check the "package-lock.json" is valid, so you should only set `allowed-actors` you trust, or validate that the "package-lock.json" is correct in another required action.
+
 ## Config
 
 - `repo-token`: a GitHub API token. E.g. `${{ secrets.GITHUB_TOKEN }}`
