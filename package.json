@@ -32,7 +32,7 @@
     "deep-object-diff": "^1.1.0",
     "husky": "^4.2.5",
     "prettier": "^2.1.1",
-    "rollup": "^2.26.8",
+    "rollup": "^2.26.9",
     "rollup-plugin-typescript2": "^0.27.2",
     "semver": "^7.3.2",
     "tslib": "^2.0.1",
