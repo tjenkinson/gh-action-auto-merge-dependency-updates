@@ -7931,7 +7931,6 @@ function run() {
                                                             repo: context.repo.repo,
                                                             pull_number: pr.number,
                                                             sha: prData.data.head.sha,
-                                                            commit_message: 'Merged by [tjenkinson/gh-action-auto-merge-dependency-updates](https://github.com/tjenkinson/gh-action-auto-merge-dependency-updates)',
                                                         })];
                                                 case 3:
                                                     _a.sent();
