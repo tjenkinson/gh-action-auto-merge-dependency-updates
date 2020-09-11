@@ -7836,7 +7836,9 @@ var semver$1 = {
 };
 
 var semverRegex = /^([~^]?)[0-9]+\.[0-9]+\.[0-9]+(-.+)?$/;
-var retryDelays = [1, 1, 1, 2, 3, 4, 5, 10, 20, 40, 60, 60, 60, 120].map(function (a) { return a * 1000; });
+var retryDelays = [1, 1, 1, 2, 3, 4, 5, 10, 20, 40, 60].map(function (a) { return a * 1000; });
+var timeout = 60 * 60 * 1000;
+var startTime = Date.now();
 function run() {
     return __awaiter(this, void 0, void 0, function () {
         var context, payload, token, allowedActors, allowedUpdateTypes, packageBlockList, pr, octokit, readPackageJson, mergeWhenPossible, getCommit, getPR, validVersionChange, commit, onlyPackageJsonChanged, base, packageJsonBase, packageJsonPr, diff, allowedChange;
@@ -7908,7 +7910,7 @@ function run() {
                             switch (_a.label) {
                                 case 0:
                                     _loop_1 = function (i) {
-                                        var prData, mergeable, e_1;
+                                        var prData, mergeable, e_1, delay;
                                         return __generator(this, function (_a) {
                                             switch (_a.label) {
                                                 case 0:
@@ -7949,10 +7951,12 @@ function run() {
                                                     core.error('Not mergeable yet');
                                                     _a.label = 7;
                                                 case 7:
-                                                    core.info("Retry in " + retryDelays[i] + " ms");
-                                                    return [4 /*yield*/, new Promise(function (resolve) {
-                                                            return setTimeout(function () { return resolve(); }, retryDelays[i]);
-                                                        })];
+                                                    if (Date.now() - startTime > timeout) {
+                                                        return [2 /*return*/, "break"];
+                                                    }
+                                                    delay = retryDelays[Math.min(retryDelays.length - 1, i)];
+                                                    core.info("Retry in " + delay + " ms");
+                                                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(function () { return resolve(); }, delay); })];
                                                 case 8:
                                                     _a.sent();
                                                     return [2 /*return*/];
@@ -7961,19 +7965,19 @@ function run() {
                                     };
                                     i = 0;
                                     _a.label = 1;
-                                case 1:
-                                    if (!(i < retryDelays.length)) return [3 /*break*/, 4];
-                                    return [5 /*yield**/, _loop_1(i)];
+                                case 1: return [5 /*yield**/, _loop_1(i)];
                                 case 2:
                                     state_1 = _a.sent();
                                     if (typeof state_1 === "object")
                                         return [2 /*return*/, state_1.value];
+                                    if (state_1 === "break")
+                                        return [3 /*break*/, 4];
                                     _a.label = 3;
                                 case 3:
                                     i++;
                                     return [3 /*break*/, 1];
                                 case 4:
-                                    core.error('Ran out of retries');
+                                    core.error('Timed out');
                                     return [2 /*return*/];
                             }
                         });
