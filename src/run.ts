@@ -5,9 +5,9 @@ import { detailedDiff } from 'deep-object-diff';
 import semver from 'semver';
 
 const semverRegex = /^([~^]?)[0-9]+\.[0-9]+\.[0-9]+(-.+)?$/;
-const retryDelays = [1, 1, 1, 2, 3, 4, 5, 10, 20, 40, 60, 60, 60, 120].map(
-  (a) => a * 1000
-);
+const retryDelays = [1, 1, 1, 2, 3, 4, 5, 10, 20, 40, 60].map((a) => a * 1000);
+const timeout = 60 * 60 * 1000;
+const startTime = Date.now();
 
 export async function run(): Promise<void> {
   core.info('Starting');
@@ -81,7 +81,7 @@ export async function run(): Promise<void> {
   };
 
   const mergeWhenPossible = async (): Promise<void> => {
-    for (let i = 0; i < retryDelays.length; i++) {
+    for (let i = 0; ; i++) {
       core.info(`Attempt: ${i}`);
       const prData = await getPR();
       if (prData.data.state !== 'open') {
@@ -111,12 +111,15 @@ export async function run(): Promise<void> {
         core.error('Not mergeable yet');
       }
 
-      core.info(`Retry in ${retryDelays[i]} ms`);
-      await new Promise((resolve) =>
-        setTimeout(() => resolve(), retryDelays[i])
-      );
+      if (Date.now() - startTime > timeout) {
+        break;
+      }
+
+      const delay = retryDelays[Math.min(retryDelays.length - 1, i)];
+      core.info(`Retry in ${delay} ms`);
+      await new Promise((resolve) => setTimeout(() => resolve(), delay));
     }
-    core.error('Ran out of retries');
+    core.error('Timed out');
   };
 
   const getCommit = () =>
