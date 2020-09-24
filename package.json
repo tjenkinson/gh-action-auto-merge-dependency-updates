@@ -23,9 +23,9 @@
   },
   "homepage": "https://github.com/tjenkinson/gh-action-auto-merge-dependency-updates#readme",
   "devDependencies": {
-    "@actions/core": "^1.2.5",
-    "@actions/github": "^4.0.0",
-    "@octokit/webhooks": "^7.11.2",
+    "@actions/core": "1.2.6",
+    "@actions/github": "4.0.0",
+    "@octokit/webhooks": "7.11.3",
     "@rollup/plugin-commonjs": "^15.0.0",
     "@rollup/plugin-node-resolve": "^9.0.0",
     "@types/semver": "^7.3.3",
