@@ -11,6 +11,9 @@ inputs:
   allowed-update-types:
     description: 'Comma separated list of types of updates that are allowed. Supported: [devDependencies|dependencies]:[major|minor|patch]'
     default: 'devDependencies:minor, devDependencies:patch'
+  approve:
+    description: 'Automatically approve the PR if it qualifies for auto merge'
+    default: 'true'
   package-block-list:
     required: false
     description: 'Comma separated list of packages that auto merge should not be allowed for'

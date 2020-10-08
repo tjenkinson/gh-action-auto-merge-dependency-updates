@@ -1,8 +1,8 @@
 'use strict';
 
 var require$$0 = require('os');
-var require$$1 = require('path');
 var fs_1 = require('fs');
+var require$$1 = require('path');
 var url = require('url');
 var http = require('http');
 var https = require('https');
@@ -17,8 +17,8 @@ var zlib = require('zlib');
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
 var require$$0__default = /*#__PURE__*/_interopDefaultLegacy(require$$0);
-var require$$1__default = /*#__PURE__*/_interopDefaultLegacy(require$$1);
 var fs_1__default = /*#__PURE__*/_interopDefaultLegacy(fs_1);
+var require$$1__default = /*#__PURE__*/_interopDefaultLegacy(require$$1);
 var url__default = /*#__PURE__*/_interopDefaultLegacy(url);
 var http__default = /*#__PURE__*/_interopDefaultLegacy(http);
 var https__default = /*#__PURE__*/_interopDefaultLegacy(https);
@@ -32,17 +32,53 @@ var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof win
 
 function createCommonjsModule(fn, basedir, module) {
 	return module = {
-	  path: basedir,
-	  exports: {},
-	  require: function (path, base) {
-      return commonjsRequire(path, (base === undefined || base === null) ? module.path : base);
-    }
+		path: basedir,
+		exports: {},
+		require: function (path, base) {
+			return commonjsRequire(path, (base === undefined || base === null) ? module.path : base);
+		}
 	}, fn(module, module.exports), module.exports;
+}
+
+function getAugmentedNamespace(n) {
+	if (n.__esModule) return n;
+	var a = Object.defineProperty({}, '__esModule', {value: true});
+	Object.keys(n).forEach(function (k) {
+		var d = Object.getOwnPropertyDescriptor(n, k);
+		Object.defineProperty(a, k, d.get ? d : {
+			enumerable: true,
+			get: function () {
+				return n[k];
+			}
+		});
+	});
+	return a;
 }
 
 function commonjsRequire () {
 	throw new Error('Dynamic requires are not currently supported by @rollup/plugin-commonjs');
 }
+
+var utils = createCommonjsModule(function (module, exports) {
+// We use any as a valid input type
+/* eslint-disable @typescript-eslint/no-explicit-any */
+Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * Sanitizes an input into a string so it can be passed into issueCommand safely
+ * @param input input to sanitize into a string
+ */
+function toCommandValue(input) {
+    if (input === null || input === undefined) {
+        return '';
+    }
+    else if (typeof input === 'string' || input instanceof String) {
+        return input;
+    }
+    return JSON.stringify(input);
+}
+exports.toCommandValue = toCommandValue;
+
+});
 
 var command = createCommonjsModule(function (module, exports) {
 var __importStar = (commonjsGlobal && commonjsGlobal.__importStar) || function (mod) {
@@ -54,6 +90,7 @@ var __importStar = (commonjsGlobal && commonjsGlobal.__importStar) || function (
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const os = __importStar(require$$0__default['default']);
+
 /**
  * Commands
  *
@@ -107,34 +144,51 @@ class Command {
         return cmdStr;
     }
 }
-/**
- * Sanitizes an input into a string so it can be passed into issueCommand safely
- * @param input input to sanitize into a string
- */
-function toCommandValue(input) {
-    if (input === null || input === undefined) {
-        return '';
-    }
-    else if (typeof input === 'string' || input instanceof String) {
-        return input;
-    }
-    return JSON.stringify(input);
-}
-exports.toCommandValue = toCommandValue;
 function escapeData(s) {
-    return toCommandValue(s)
+    return utils.toCommandValue(s)
         .replace(/%/g, '%25')
         .replace(/\r/g, '%0D')
         .replace(/\n/g, '%0A');
 }
 function escapeProperty(s) {
-    return toCommandValue(s)
+    return utils.toCommandValue(s)
         .replace(/%/g, '%25')
         .replace(/\r/g, '%0D')
         .replace(/\n/g, '%0A')
         .replace(/:/g, '%3A')
         .replace(/,/g, '%2C');
 }
+
+});
+
+var fileCommand = createCommonjsModule(function (module, exports) {
+// For internal use, subject to change.
+var __importStar = (commonjsGlobal && commonjsGlobal.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+// We use any as a valid input type
+/* eslint-disable @typescript-eslint/no-explicit-any */
+const fs = __importStar(fs_1__default['default']);
+const os = __importStar(require$$0__default['default']);
+
+function issueCommand(command, message) {
+    const filePath = process.env[`GITHUB_${command}`];
+    if (!filePath) {
+        throw new Error(`Unable to find environment variable for file command ${command}`);
+    }
+    if (!fs.existsSync(filePath)) {
+        throw new Error(`Missing file at path: ${filePath}`);
+    }
+    fs.appendFileSync(filePath, `${utils.toCommandValue(message)}${os.EOL}`, {
+        encoding: 'utf8'
+    });
+}
+exports.issueCommand = issueCommand;
 
 });
 
@@ -156,6 +210,8 @@ var __importStar = (commonjsGlobal && commonjsGlobal.__importStar) || function (
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+
+
 
 const os = __importStar(require$$0__default['default']);
 const path = __importStar(require$$1__default['default']);
@@ -183,9 +239,17 @@ var ExitCode;
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function exportVariable(name, val) {
-    const convertedVal = command.toCommandValue(val);
+    const convertedVal = utils.toCommandValue(val);
     process.env[name] = convertedVal;
-    command.issueCommand('set-env', { name }, convertedVal);
+    const filePath = process.env['GITHUB_ENV'] || '';
+    if (filePath) {
+        const delimiter = '_GitHubActionsFileCommandDelimeter_';
+        const commandValue = `${name}<<${delimiter}${os.EOL}${convertedVal}${os.EOL}${delimiter}`;
+        fileCommand.issueCommand('ENV', commandValue);
+    }
+    else {
+        command.issueCommand('set-env', { name }, convertedVal);
+    }
 }
 exports.exportVariable = exportVariable;
 /**
@@ -201,7 +265,13 @@ exports.setSecret = setSecret;
  * @param inputPath
  */
 function addPath(inputPath) {
-    command.issueCommand('add-path', {}, inputPath);
+    const filePath = process.env['GITHUB_PATH'] || '';
+    if (filePath) {
+        fileCommand.issueCommand('PATH', inputPath);
+    }
+    else {
+        command.issueCommand('add-path', {}, inputPath);
+    }
     process.env['PATH'] = `${inputPath}${path.delimiter}${process.env['PATH']}`;
 }
 exports.addPath = addPath;
@@ -1324,7 +1394,7 @@ class HttpClient {
 exports.HttpClient = HttpClient;
 });
 
-var utils = createCommonjsModule(function (module, exports) {
+var utils$1 = createCommonjsModule(function (module, exports) {
 var __createBinding = (commonjsGlobal && commonjsGlobal.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
@@ -2415,6 +2485,12 @@ function convertBody(buffer, headers) {
 	// html4
 	if (!res && str) {
 		res = /<meta[\s]+?http-equiv=(['"])content-type\1[\s]+?content=(['"])(.+?)\2/i.exec(str);
+		if (!res) {
+			res = /<meta[\s]+?content=(['"])(.+?)\1[\s]+?http-equiv=(['"])content-type\3/i.exec(str);
+			if (res) {
+				res.pop(); // drop last quote
+			}
+		}
 
 		if (res) {
 			res = /charset=(.*)/i.exec(res.pop());
@@ -3422,7 +3498,7 @@ function fetch(url, opts) {
 				// HTTP fetch step 5.5
 				switch (request.redirect) {
 					case 'error':
-						reject(new FetchError(`redirect mode is set to error: ${request.url}`, 'no-redirect'));
+						reject(new FetchError(`uri requested responds with a redirect, redirect mode is set to error: ${request.url}`, 'no-redirect'));
 						finalize();
 						return;
 					case 'manual':
@@ -3461,7 +3537,8 @@ function fetch(url, opts) {
 							method: request.method,
 							body: request.body,
 							signal: request.signal,
-							timeout: request.timeout
+							timeout: request.timeout,
+							size: request.size
 						};
 
 						// HTTP-redirect fetch step 9
@@ -5515,7 +5592,13 @@ var distWeb$2 = /*#__PURE__*/Object.freeze({
 	paginateRest: paginateRest
 });
 
-var utils$1 = createCommonjsModule(function (module, exports) {
+var core_1 = /*@__PURE__*/getAugmentedNamespace(distWeb);
+
+var plugin_rest_endpoint_methods_1 = /*@__PURE__*/getAugmentedNamespace(distWeb$1);
+
+var plugin_paginate_rest_1 = /*@__PURE__*/getAugmentedNamespace(distWeb$2);
+
+var utils$2 = createCommonjsModule(function (module, exports) {
 var __createBinding = (commonjsGlobal && commonjsGlobal.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
@@ -5538,7 +5621,7 @@ var __importStar = (commonjsGlobal && commonjsGlobal.__importStar) || function (
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getOctokitOptions = exports.GitHub = exports.context = void 0;
 const Context = __importStar(context);
-const Utils = __importStar(utils);
+const Utils = __importStar(utils$1);
 // octokit + plugins
 
 
@@ -5551,7 +5634,7 @@ const defaults = {
         agent: Utils.getProxyAgent(baseUrl)
     }
 };
-exports.GitHub = distWeb.Octokit.plugin(distWeb$1.restEndpointMethods, distWeb$2.paginateRest).defaults(defaults);
+exports.GitHub = core_1.Octokit.plugin(plugin_rest_endpoint_methods_1.restEndpointMethods, plugin_paginate_rest_1.paginateRest).defaults(defaults);
 /**
  * Convience function to correctly format Octokit Options to pass into the constructor.
  *
@@ -5603,15 +5686,15 @@ exports.context = new Context.Context();
  * @param     options  other options to set
  */
 function getOctokit(token, options) {
-    return new utils$1.GitHub(utils$1.getOctokitOptions(token, options));
+    return new utils$2.GitHub(utils$2.getOctokitOptions(token, options));
 }
 exports.getOctokit = getOctokit;
 
 });
 
-var utils$2 = createCommonjsModule(function (module, exports) {
+var utils$3 = createCommonjsModule(function (module, exports) {
 (function (global, factory) {
-  var mod; {
+  {
     factory(exports);
   }
 })(commonjsGlobal, function (exports) {
@@ -5657,8 +5740,8 @@ var utils$2 = createCommonjsModule(function (module, exports) {
 
 var diff = createCommonjsModule(function (module, exports) {
 (function (global, factory) {
-  var mod; {
-    factory(module, exports, utils$2);
+  {
+    factory(module, exports, utils$3);
   }
 })(commonjsGlobal, function (module, exports, _utils) {
 
@@ -5730,8 +5813,8 @@ var diff = createCommonjsModule(function (module, exports) {
 
 var added = createCommonjsModule(function (module, exports) {
 (function (global, factory) {
-  var mod; {
-    factory(module, exports, utils$2);
+  {
+    factory(module, exports, utils$3);
   }
 })(commonjsGlobal, function (module, exports, _utils) {
 
@@ -5795,8 +5878,8 @@ var added = createCommonjsModule(function (module, exports) {
 
 var deleted = createCommonjsModule(function (module, exports) {
 (function (global, factory) {
-  var mod; {
-    factory(module, exports, utils$2);
+  {
+    factory(module, exports, utils$3);
   }
 })(commonjsGlobal, function (module, exports, _utils) {
 
@@ -5859,8 +5942,8 @@ var deleted = createCommonjsModule(function (module, exports) {
 
 var updated = createCommonjsModule(function (module, exports) {
 (function (global, factory) {
-  var mod; {
-    factory(module, exports, utils$2);
+  {
+    factory(module, exports, utils$3);
   }
 })(commonjsGlobal, function (module, exports, _utils) {
 
@@ -5932,7 +6015,7 @@ var updated = createCommonjsModule(function (module, exports) {
 
 var detailed = createCommonjsModule(function (module, exports) {
 (function (global, factory) {
-  var mod; {
+  {
     factory(module, exports, added, deleted, updated);
   }
 })(commonjsGlobal, function (module, exports, _added, _deleted, _updated) {
@@ -5968,7 +6051,7 @@ var detailed = createCommonjsModule(function (module, exports) {
 
 var dist = createCommonjsModule(function (module, exports) {
 (function (global, factory) {
-  var mod; {
+  {
     factory(exports, diff, added, deleted, updated, detailed);
   }
 })(commonjsGlobal, function (exports, _diff, _added, _deleted, _updated, _detailed) {
@@ -7841,7 +7924,7 @@ var timeout = 60 * 60 * 1000;
 var startTime = Date.now();
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var context, payload, token, allowedActors, allowedUpdateTypes, packageBlockList, pr, octokit, readPackageJson, mergeWhenPossible, getCommit, getPR, validVersionChange, commit, onlyPackageJsonChanged, base, packageJsonBase, packageJsonPr, diff, allowedChange;
+        var context, payload, token, allowedActors, allowedUpdateTypes, approve, packageBlockList, pr, octokit, readPackageJson, mergeWhenPossible, getCommit, getPR, approvePR, validVersionChange, commit, onlyPackageJsonChanged, base, packageJsonBase, packageJsonPr, diff, allowedChange;
         var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -7876,6 +7959,7 @@ function run() {
                         }
                         allowedUpdateTypes[dependencyType].push(bumpType);
                     });
+                    approve = core.getInput('approve') === 'true';
                     packageBlockList = (core.getInput('package-block-list') || '')
                         .split(',')
                         .map(function (a) { return a.trim(); });
@@ -7996,6 +8080,30 @@ function run() {
                             pull_number: pr.number,
                         });
                     };
+                    approvePR = function () { return __awaiter(_this, void 0, void 0, function () {
+                        var review;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0: return [4 /*yield*/, octokit.pulls.createReview({
+                                        owner: context.repo.owner,
+                                        repo: context.repo.repo,
+                                        pull_number: pr.number,
+                                    })];
+                                case 1:
+                                    review = _a.sent();
+                                    return [4 /*yield*/, octokit.pulls.submitReview({
+                                            owner: context.repo.owner,
+                                            repo: context.repo.repo,
+                                            pull_number: pr.number,
+                                            review_id: review.data.id,
+                                            event: 'APPROVE',
+                                        })];
+                                case 2:
+                                    _a.sent();
+                                    return [2 /*return*/];
+                            }
+                        });
+                    }); };
                     validVersionChange = function (oldVersion, newVersion, allowedBumpTypes) {
                         var oldVersionMatches = semverRegex.exec(oldVersion);
                         if (!oldVersionMatches) {
@@ -8086,9 +8194,16 @@ function run() {
                         core.error('One or more version changes are not allowed');
                         return [2 /*return*/];
                     }
+                    if (!approve) return [3 /*break*/, 5];
+                    core.info('Approving PR');
+                    return [4 /*yield*/, approvePR()];
+                case 4:
+                    _a.sent();
+                    _a.label = 5;
+                case 5:
                     core.info('Merging when possible');
                     return [4 /*yield*/, mergeWhenPossible()];
-                case 4:
+                case 6:
                     _a.sent();
                     core.info('Finished!');
                     return [2 /*return*/];
