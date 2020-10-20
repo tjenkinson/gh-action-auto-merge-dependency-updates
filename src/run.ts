@@ -122,6 +122,7 @@ export async function run(): Promise<void> {
       await new Promise((resolve) => setTimeout(() => resolve(), delay));
     }
     core.error('Timed out');
+    throw new Error('Timed out');
   };
 
   const getCommit = () =>
