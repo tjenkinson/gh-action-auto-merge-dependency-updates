@@ -8141,11 +8141,11 @@ function run() {
                     commit = _a.sent();
                     onlyPackageJsonChanged = commit.data.files.every(function (_a) {
                         var filename = _a.filename, status = _a.status;
-                        return ['package.json', 'package-lock.json'].includes(filename) &&
+                        return ['package.json', 'package-lock.json', 'yarn.lock'].includes(filename) &&
                             status === 'modified';
                     });
                     if (!onlyPackageJsonChanged) {
-                        core.error('More changed than the package.json and package-lock.json');
+                        core.error('More changed than the package.json and lockfile');
                         return [2 /*return*/];
                     }
                     core.info('Getting base');
