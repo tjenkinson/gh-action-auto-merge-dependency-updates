@@ -14,7 +14,7 @@ Note that the action does not check the "package-lock.json" is valid, so you sho
 - `approve` (optional): Automatically approve the PR if it qualifies for auto merge. _Default: `true`_
 - `package-block-list` (optional): A comma separated list of packages that auto merge should not be allowed for.
 
-You should configure this action to run on the `pull_request` and `pull_request_review` events.
+You should configure this action to run on the `pull_request` event.
 
 ## Example Action
 
@@ -23,7 +23,6 @@ name: Auto Merge Dependency Updates
 
 on:
   - pull_request
-  - pull_request_review
 
 jobs:
   run:
