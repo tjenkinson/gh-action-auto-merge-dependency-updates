@@ -6,7 +6,7 @@ import semver from 'semver';
 
 const semverRegex = /^([~^]?)[0-9]+\.[0-9]+\.[0-9]+(-.+)?$/;
 const retryDelays = [1, 1, 1, 2, 3, 4, 5, 10, 20, 40, 60].map((a) => a * 1000);
-const timeout = 60 * 60 * 1000;
+const timeout = 6 * 60 * 60 * 1000;
 const startTime = Date.now();
 
 export async function run(): Promise<void> {
