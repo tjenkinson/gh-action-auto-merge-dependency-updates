@@ -4,7 +4,9 @@ A GitHub action that will automatically approve and merge a PR that only contain
 
 If you run tests on PR's make sure you [configure those as required status checks](https://docs.github.com/en/github/administering-a-repository/enabling-required-status-checks) so that they need to go green before the merge can occur.
 
-Note that the action does not check the "package-lock.json" is valid, so you should only set `allowed-actors` you trust, or validate that the "package-lock.json" is correct in another required action.
+Note that the action does not check the lockfile is valid, so you should only set `allowed-actors` you trust, or validate that the lockfile is correct in another required action.
+
+It currently supports npm and yarn.
 
 ## Config
 
@@ -14,7 +16,7 @@ Note that the action does not check the "package-lock.json" is valid, so you sho
 - `approve` (optional): Automatically approve the PR if it qualifies for auto merge. _Default: `true`_
 - `package-block-list` (optional): A comma separated list of packages that auto merge should not be allowed for.
 
-You should configure this action to run on the `pull_request` and `pull_request_review` events.
+You should configure this action to run on the `pull_request` event.
 
 ## Example Action
 
@@ -23,7 +25,6 @@ name: Auto Merge Dependency Updates
 
 on:
   - pull_request
-  - pull_request_review
 
 jobs:
   run:
