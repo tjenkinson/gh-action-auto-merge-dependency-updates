@@ -197,11 +197,11 @@ export async function run(): Promise<void> {
   const commit = await getCommit();
   const onlyPackageJsonChanged = commit.data.files.every(
     ({ filename, status }) =>
-      ['package.json', 'package-lock.json'].includes(filename) &&
+      ['package.json', 'package-lock.json', 'yarn.lock'].includes(filename) &&
       status === 'modified'
   );
   if (!onlyPackageJsonChanged) {
-    core.error('More changed than the package.json and package-lock.json');
+    core.error('More changed than the package.json and lockfile');
     return;
   }
 
