@@ -7920,7 +7920,7 @@ var semver$1 = {
 
 var semverRegex = /^([~^]?)[0-9]+\.[0-9]+\.[0-9]+(-.+)?$/;
 var retryDelays = [1, 1, 1, 2, 3, 4, 5, 10, 20, 40, 60].map(function (a) { return a * 1000; });
-var timeout = 60 * 60 * 1000;
+var timeout = 6 * 60 * 60 * 1000;
 var startTime = Date.now();
 function run() {
     return __awaiter(this, void 0, void 0, function () {
@@ -8062,7 +8062,7 @@ function run() {
                                     return [3 /*break*/, 1];
                                 case 4:
                                     core.error('Timed out');
-                                    return [2 /*return*/];
+                                    throw new Error('Timed out');
                             }
                         });
                     }); };
