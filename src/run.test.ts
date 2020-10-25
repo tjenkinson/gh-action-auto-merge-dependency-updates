@@ -226,7 +226,11 @@ describe('run', () => {
           };
           mockCommit = {
             data: {
-              files: [{ filename: 'package.json', status: 'modified' }],
+              files: [
+                { filename: 'package.json', status: 'modified' },
+                { filename: 'package-lock.json', status: 'modified' },
+                { filename: 'yarn.lock', status: 'modified' },
+              ],
             },
           };
           mockPr = {};
