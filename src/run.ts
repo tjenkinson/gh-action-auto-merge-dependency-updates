@@ -207,7 +207,7 @@ export async function run(): Promise<Result> {
   );
   if (!onlyPackageJsonChanged) {
     core.error('More changed than the package.json and lockfile');
-    return Result.InvalidFiles;
+    return Result.FileNotAllowed;
   }
 
   core.info('Retrieving package.json');

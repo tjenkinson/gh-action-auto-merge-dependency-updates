@@ -1,8 +1,7 @@
 export enum Result {
   UnknownEvent,
   ActorNotAllowed,
-  // TODO better name?
-  InvalidFiles,
+  FileNotAllowed,
   UnexpectedChanges,
   UnexpectedPropertyChange,
   VersionChangeNotAllowed,

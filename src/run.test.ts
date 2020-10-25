@@ -381,20 +381,20 @@ describe('run', () => {
           mockCommit.data.files = [
             { filename: 'something', status: 'modified' },
           ];
-          expect(await run()).toBe(Result.InvalidFiles);
+          expect(await run()).toBe(Result.FileNotAllowed);
 
           mockCommit.data.files = [
             { filename: 'package.json', status: 'modified' },
             { filename: 'something', status: 'modified' },
           ];
-          expect(await run()).toBe(Result.InvalidFiles);
+          expect(await run()).toBe(Result.FileNotAllowed);
         });
 
         it('stops if an allowed file is changed but not modified', async () => {
           mockCommit.data.files = [
             { filename: 'package.json', status: 'something' },
           ];
-          expect(await run()).toBe(Result.InvalidFiles);
+          expect(await run()).toBe(Result.FileNotAllowed);
         });
 
         it('stops if the diff of the package.json contains additions', async () => {
