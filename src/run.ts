@@ -3,13 +3,14 @@ import * as github from '@actions/github';
 import * as Webhooks from '@octokit/webhooks';
 import { detailedDiff } from 'deep-object-diff';
 import semver from 'semver';
+import { Result } from './result';
 
 const semverRegex = /^([~^]?)[0-9]+\.[0-9]+\.[0-9]+(-.+)?$/;
 const retryDelays = [1, 1, 1, 2, 3, 4, 5, 10, 20, 40, 60].map((a) => a * 1000);
 const timeout = 6 * 60 * 60 * 1000;
-const startTime = Date.now();
 
-export async function run(): Promise<void> {
+export async function run(): Promise<Result> {
+  const startTime = Date.now();
   core.info('Starting');
 
   const context = github.context;
@@ -19,7 +20,7 @@ export async function run(): Promise<void> {
     !['pull_request', 'pull_request_review'].includes(github.context.eventName)
   ) {
     core.error(`Unsupported event name: ${github.context.eventName}`);
-    return;
+    return Result.UnknownEvent;
   }
   const payload:
     | Webhooks.EventPayloads.WebhookPayloadPullRequest
@@ -31,12 +32,15 @@ export async function run(): Promise<void> {
   const allowedActors = core
     .getInput('allowed-actors', { required: true })
     .split(',')
-    .map((a) => a.trim());
+    .map((a) => a.trim())
+    .filter(Boolean);
 
   const allowedUpdateTypes: Record<string, string[]> = {};
   core
     .getInput('allowed-update-types', { required: true })
     .split(',')
+    .map((a) => a.trim())
+    .filter(Boolean)
     .forEach((group) => {
       const parts = group
         .trim()
@@ -58,13 +62,12 @@ export async function run(): Promise<void> {
     .split(',')
     .map((a) => a.trim());
 
-  const pr = payload.pull_request;
-
   if (!allowedActors.includes(context.actor)) {
     core.error(`Actor not allowed: ${context.actor}`);
-    return;
+    return Result.ActorNotAllowed;
   }
 
+  const pr = payload.pull_request;
   const octokit = github.getOctokit(token);
 
   const readPackageJson = async (ref: string): Promise<Record<string, any>> => {
@@ -82,13 +85,15 @@ export async function run(): Promise<void> {
     );
   };
 
-  const mergeWhenPossible = async (): Promise<void> => {
+  const mergeWhenPossible = async (): Promise<
+    Result.PRNotOpen | Result.PRHeadChanged | Result.Success
+  > => {
     for (let i = 0; ; i++) {
       core.info(`Attempt: ${i}`);
       const prData = await getPR();
       if (prData.data.state !== 'open') {
         core.error('PR is not open');
-        return;
+        return Result.PRNotOpen;
       }
       const mergeable = prData.data.mergeable;
       if (mergeable) {
@@ -101,11 +106,11 @@ export async function run(): Promise<void> {
             sha: prData.data.head.sha,
           });
           core.info('Merged');
-          return;
+          return Result.Success;
         } catch (e) {
           if (e.status && e.status === 409) {
             core.error('Failed to merge. PR head changed');
-            return;
+            return Result.PRHeadChanged;
           }
           core.error(`Merge failed: ${e}`);
         }
@@ -113,7 +118,7 @@ export async function run(): Promise<void> {
         core.error('Not mergeable yet');
       }
 
-      if (Date.now() - startTime > timeout) {
+      if (Date.now() - startTime >= timeout) {
         break;
       }
 
@@ -202,39 +207,37 @@ export async function run(): Promise<void> {
   );
   if (!onlyPackageJsonChanged) {
     core.error('More changed than the package.json and lockfile');
-    return;
+    return Result.InvalidFiles;
   }
 
-  core.info('Getting base');
-  const base = pr.base;
-
   core.info('Retrieving package.json');
+  const base = pr.base;
   const packageJsonBase = await readPackageJson(base.ref);
   const packageJsonPr = await readPackageJson(context.ref);
 
   core.info('Calculating diff');
   const diff: any = detailedDiff(packageJsonBase, packageJsonPr);
+  core.debug(JSON.stringify(diff, null, 2));
   if (Object.keys(diff.added).length || Object.keys(diff.deleted).length) {
     core.error('Unexpected changes');
-    return;
+    return Result.UnexpectedChanges;
   }
-  core.debug(JSON.stringify(diff, null, 2));
 
   core.info('Checking diff');
 
+  const allowedPropsChanges = Object.keys(diff.updated).every((prop) => {
+    return (
+      ['dependencies', 'devDependencies'].includes(prop) &&
+      typeof diff.updated[prop] === 'object'
+    );
+  });
+  if (!allowedPropsChanges) {
+    core.error('Unexpected property change');
+    return Result.UnexpectedPropertyChange;
+  }
+
   const allowedChange = Object.keys(diff.updated).every((prop) => {
-    if (
-      !['dependencies', 'devDependencies'].includes(prop) ||
-      typeof diff.updated[prop] !== 'object'
-    ) {
-      return false;
-    }
-
     const allowedBumpTypes = allowedUpdateTypes[prop] || [];
-    if (!allowedBumpTypes.length) {
-      return false;
-    }
-
     const changedDependencies = diff.updated[prop];
     return Object.keys(changedDependencies).every((dependency) => {
       if (typeof changedDependencies[dependency] !== 'string') {
@@ -254,7 +257,7 @@ export async function run(): Promise<void> {
 
   if (!allowedChange) {
     core.error('One or more version changes are not allowed');
-    return;
+    return Result.VersionChangeNotAllowed;
   }
 
   if (approve) {
@@ -263,6 +266,7 @@ export async function run(): Promise<void> {
   }
 
   core.info('Merging when possible');
-  await mergeWhenPossible();
+  const result = await mergeWhenPossible();
   core.info('Finished!');
+  return result;
 }
