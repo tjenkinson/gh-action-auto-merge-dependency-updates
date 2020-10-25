@@ -3,7 +3,7 @@
     "module": "ESNext",
     "target": "ES5",
     "lib": ["dom", "es2015"],
-    "types": [],
+    "types": ["jest"],
     "strict": true,
     "noFallthroughCasesInSwitch": true,
     "strictNullChecks": true,

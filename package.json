@@ -7,7 +7,8 @@
     "build": "rm -rf dist && rollup --config rollup.config.js",
     "watch": "rollup --config rollup.config.js --watch",
     "prettier": "prettier --write .",
-    "lint": "prettier --check ."
+    "lint": "prettier --check .",
+    "test": "jest --coverage"
   },
   "hooks": {
     "pre-commit": "npm run prettier"
@@ -28,13 +29,18 @@
     "@octokit/webhooks": "7.15.0",
     "@rollup/plugin-commonjs": "^15.0.0",
     "@rollup/plugin-node-resolve": "^9.0.0",
+    "@types/jest": "^26.0.15",
+    "@types/jest-when": "^2.7.2",
     "@types/semver": "^7.3.3",
     "deep-object-diff": "^1.1.0",
     "husky": "^4.2.5",
+    "jest": "^26.6.0",
+    "jest-when": "^2.8.0",
     "prettier": "^2.1.1",
     "rollup": "^2.26.9",
     "rollup-plugin-typescript2": "^0.28.0",
     "semver": "^7.3.2",
+    "ts-jest": "^26.4.1",
     "tslib": "^2.0.1",
     "typescript": "^4.0.2"
   }
