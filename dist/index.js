@@ -7918,33 +7918,49 @@ var semver$1 = {
   subset: subset_1,
 };
 
+var Result;
+(function (Result) {
+    Result[Result["UnknownEvent"] = 0] = "UnknownEvent";
+    Result[Result["ActorNotAllowed"] = 1] = "ActorNotAllowed";
+    Result[Result["FileNotAllowed"] = 2] = "FileNotAllowed";
+    Result[Result["UnexpectedChanges"] = 3] = "UnexpectedChanges";
+    Result[Result["UnexpectedPropertyChange"] = 4] = "UnexpectedPropertyChange";
+    Result[Result["VersionChangeNotAllowed"] = 5] = "VersionChangeNotAllowed";
+    Result[Result["PRNotOpen"] = 6] = "PRNotOpen";
+    Result[Result["PRHeadChanged"] = 7] = "PRHeadChanged";
+    Result[Result["Success"] = 8] = "Success";
+})(Result || (Result = {}));
+
 var semverRegex = /^([~^]?)[0-9]+\.[0-9]+\.[0-9]+(-.+)?$/;
 var retryDelays = [1, 1, 1, 2, 3, 4, 5, 10, 20, 40, 60].map(function (a) { return a * 1000; });
 var timeout = 6 * 60 * 60 * 1000;
-var startTime = Date.now();
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var context, payload, token, allowedActors, allowedUpdateTypes, approve, packageBlockList, pr, octokit, readPackageJson, mergeWhenPossible, getCommit, getPR, approvePR, validVersionChange, commit, onlyPackageJsonChanged, base, packageJsonBase, packageJsonPr, diff, allowedChange;
+        var startTime, context, payload, token, allowedActors, allowedUpdateTypes, approve, packageBlockList, pr, octokit, readPackageJson, mergeWhenPossible, getCommit, getPR, approvePR, validVersionChange, commit, onlyPackageJsonChanged, base, packageJsonBase, packageJsonPr, diff, allowedPropsChanges, allowedChange, result;
         var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
+                    startTime = Date.now();
                     core.info('Starting');
                     context = github.context;
                     core.debug(JSON.stringify(context, null, 2));
                     if (!['pull_request', 'pull_request_review'].includes(github.context.eventName)) {
                         core.error("Unsupported event name: " + github.context.eventName);
-                        return [2 /*return*/];
+                        return [2 /*return*/, Result.UnknownEvent];
                     }
                     payload = github.context
                         .payload;
                     token = core.getInput('repo-token', { required: true });
                     allowedActors = core.getInput('allowed-actors', { required: true })
                         .split(',')
-                        .map(function (a) { return a.trim(); });
+                        .map(function (a) { return a.trim(); })
+                        .filter(Boolean);
                     allowedUpdateTypes = {};
                     core.getInput('allowed-update-types', { required: true })
                         .split(',')
+                        .map(function (a) { return a.trim(); })
+                        .filter(Boolean)
                         .forEach(function (group) {
                         var parts = group
                             .trim()
@@ -7963,11 +7979,11 @@ function run() {
                     packageBlockList = (core.getInput('package-block-list') || '')
                         .split(',')
                         .map(function (a) { return a.trim(); });
-                    pr = payload.pull_request;
                     if (!allowedActors.includes(context.actor)) {
                         core.error("Actor not allowed: " + context.actor);
-                        return [2 /*return*/];
+                        return [2 /*return*/, Result.ActorNotAllowed];
                     }
+                    pr = payload.pull_request;
                     octokit = github.getOctokit(token);
                     readPackageJson = function (ref) { return __awaiter(_this, void 0, void 0, function () {
                         var content;
@@ -8004,7 +8020,7 @@ function run() {
                                                     prData = _a.sent();
                                                     if (prData.data.state !== 'open') {
                                                         core.error('PR is not open');
-                                                        return [2 /*return*/, { value: void 0 }];
+                                                        return [2 /*return*/, { value: Result.PRNotOpen }];
                                                     }
                                                     mergeable = prData.data.mergeable;
                                                     if (!mergeable) return [3 /*break*/, 6];
@@ -8021,12 +8037,12 @@ function run() {
                                                 case 3:
                                                     _a.sent();
                                                     core.info('Merged');
-                                                    return [2 /*return*/, { value: void 0 }];
+                                                    return [2 /*return*/, { value: Result.Success }];
                                                 case 4:
                                                     e_1 = _a.sent();
                                                     if (e_1.status && e_1.status === 409) {
                                                         core.error('Failed to merge. PR head changed');
-                                                        return [2 /*return*/, { value: void 0 }];
+                                                        return [2 /*return*/, { value: Result.PRHeadChanged }];
                                                     }
                                                     core.error("Merge failed: " + e_1);
                                                     return [3 /*break*/, 5];
@@ -8035,7 +8051,7 @@ function run() {
                                                     core.error('Not mergeable yet');
                                                     _a.label = 7;
                                                 case 7:
-                                                    if (Date.now() - startTime > timeout) {
+                                                    if (Date.now() - startTime >= timeout) {
                                                         return [2 /*return*/, "break"];
                                                     }
                                                     delay = retryDelays[Math.min(retryDelays.length - 1, i)];
@@ -8146,11 +8162,10 @@ function run() {
                     });
                     if (!onlyPackageJsonChanged) {
                         core.error('More changed than the package.json and lockfile');
-                        return [2 /*return*/];
+                        return [2 /*return*/, Result.FileNotAllowed];
                     }
-                    core.info('Getting base');
-                    base = pr.base;
                     core.info('Retrieving package.json');
+                    base = pr.base;
                     return [4 /*yield*/, readPackageJson(base.ref)];
                 case 2:
                     packageJsonBase = _a.sent();
@@ -8159,21 +8174,22 @@ function run() {
                     packageJsonPr = _a.sent();
                     core.info('Calculating diff');
                     diff = dist.detailedDiff(packageJsonBase, packageJsonPr);
+                    core.debug(JSON.stringify(diff, null, 2));
                     if (Object.keys(diff.added).length || Object.keys(diff.deleted).length) {
                         core.error('Unexpected changes');
-                        return [2 /*return*/];
+                        return [2 /*return*/, Result.UnexpectedChanges];
                     }
-                    core.debug(JSON.stringify(diff, null, 2));
                     core.info('Checking diff');
+                    allowedPropsChanges = Object.keys(diff.updated).every(function (prop) {
+                        return (['dependencies', 'devDependencies'].includes(prop) &&
+                            typeof diff.updated[prop] === 'object');
+                    });
+                    if (!allowedPropsChanges) {
+                        core.error('Unexpected property change');
+                        return [2 /*return*/, Result.UnexpectedPropertyChange];
+                    }
                     allowedChange = Object.keys(diff.updated).every(function (prop) {
-                        if (!['dependencies', 'devDependencies'].includes(prop) ||
-                            typeof diff.updated[prop] !== 'object') {
-                            return false;
-                        }
                         var allowedBumpTypes = allowedUpdateTypes[prop] || [];
-                        if (!allowedBumpTypes.length) {
-                            return false;
-                        }
                         var changedDependencies = diff.updated[prop];
                         return Object.keys(changedDependencies).every(function (dependency) {
                             if (typeof changedDependencies[dependency] !== 'string') {
@@ -8192,7 +8208,7 @@ function run() {
                     });
                     if (!allowedChange) {
                         core.error('One or more version changes are not allowed');
-                        return [2 /*return*/];
+                        return [2 /*return*/, Result.VersionChangeNotAllowed];
                     }
                     if (!approve) return [3 /*break*/, 5];
                     core.info('Approving PR');
@@ -8204,9 +8220,9 @@ function run() {
                     core.info('Merging when possible');
                     return [4 /*yield*/, mergeWhenPossible()];
                 case 6:
-                    _a.sent();
+                    result = _a.sent();
                     core.info('Finished!');
-                    return [2 /*return*/];
+                    return [2 /*return*/, result];
             }
         });
     });
