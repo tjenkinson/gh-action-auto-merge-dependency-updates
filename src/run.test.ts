@@ -105,9 +105,7 @@ const versionChanges: VersionChange[] = [
 
 const realSetTimeout = setTimeout;
 function whenAllPromisesFinished(): Promise<void> {
-  return new Promise((resolve) => {
-    return realSetTimeout(() => resolve(), 0);
-  });
+  return new Promise((resolve) => realSetTimeout(() => resolve(), 0));
 }
 
 const allowedUpdateTypeCombinations: {
