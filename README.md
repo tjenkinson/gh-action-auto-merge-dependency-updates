@@ -10,7 +10,7 @@ It currently supports npm and yarn.
 
 ## Config
 
-- `repo-token`: a GitHub API token. E.g. `${{ secrets.GITHUB_TOKEN }}`
+- `repo-token` (optional): a GitHub API token. _Default: The token provided to the workflow (`${{ github.token }}`)_
 - `allowed-actors`: A comma separated list of usernames auto merge is allowed for.
 - `allowed-update-types` (optional): A comma separated list of types of updates that are allowed. Supported: [devDependencies|dependencies]:[major|minor|patch]. _Default: `devDependencies:minor, devDependencies:patch`_
 - `approve` (optional): Automatically approve the PR if it qualifies for auto merge. _Default: `true`_

@@ -3,8 +3,8 @@ description: 'Automatically merge a PR that only contains dependency updates, ba
 author: 'Tom Jenkinson'
 inputs:
   repo-token:
-    required: true
     description: 'GitHub API token'
+    default: ${{ github.token }}
   allowed-actors:
     required: true
     description: 'Comma separated list of usernames auto merge is allowed for'
