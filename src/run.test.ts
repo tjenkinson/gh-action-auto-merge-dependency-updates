@@ -182,10 +182,10 @@ describe('run', () => {
           .calledWith('allowed-update-types', { required: true })
           .mockImplementation(() => mockAllowedUpdateTypes);
         getInputMock
-          .calledWith('approve', undefined)
+          .calledWith('approve')
           .mockImplementation(() => mockApprove);
         getInputMock
-          .calledWith('package-block-list', undefined)
+          .calledWith('package-block-list')
           .mockImplementation(() => mockPackageBlockList);
       });
 
