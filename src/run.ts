@@ -1,6 +1,8 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import * as Webhooks from '@octokit/webhooks';
+import { GitHub, getOctokitOptions } from '@actions/github/lib/utils';
+import { throttling } from '@octokit/plugin-throttling';
 import { detailedDiff } from 'deep-object-diff';
 import semver from 'semver';
 import { Result } from './result';
@@ -68,7 +70,22 @@ export async function run(): Promise<Result> {
   }
 
   const pr = payload.pull_request;
-  const octokit = github.getOctokit(token);
+
+  const Octokit = GitHub.plugin(throttling);
+  const octokit = new Octokit(
+    getOctokitOptions(token, {
+      throttle: {
+        onRateLimit: /* istanbul ignore next */ (retryAfter: number) => {
+          core.warning(`Hit rate limit. Retrying in ${retryAfter} seconds`);
+          return true;
+        },
+        onAbuseLimit: /* istanbul ignore next */ (retryAfter: number) => {
+          core.warning(`Hit abuse limit. Retrying in ${retryAfter} seconds`);
+          return true;
+        },
+      },
+    })
+  );
 
   const readPackageJson = async (ref: string): Promise<Record<string, any>> => {
     const content = await octokit.repos.getContent({
