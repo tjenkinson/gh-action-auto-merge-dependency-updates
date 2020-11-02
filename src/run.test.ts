@@ -1,4 +1,6 @@
 import * as github from '@actions/github';
+import * as githubUtils from '@actions/github/lib/utils';
+import { throttling } from '@octokit/plugin-throttling';
 import * as core from '@actions/core';
 import { when } from 'jest-when';
 import { Result } from './result';
@@ -339,12 +341,25 @@ describe('run', () => {
             },
           };
 
-          when(github.getOctokit as any)
-            .mockImplementation(() => {
-              throw new Error('Unexpected call');
-            })
-            .calledWith('token')
+          const getOctokitOptionsReturn = Symbol('getOctokitOptionsReturn');
+          when((githubUtils as any).getOctokitOptions)
+            .expectCalledWith(
+              'token',
+              expect.objectContaining({
+                onRateLimit: expect.any(Function),
+                onAbuseLimit: expect.any(Function),
+              })
+            )
+            .mockReturnValue(getOctokitOptionsReturn);
+
+          const octokitMockBuilder = jest.fn();
+          when(octokitMockBuilder)
+            .expectCalledWith(getOctokitOptionsReturn)
             .mockReturnValue(octokitMock);
+
+          when((githubUtils.GitHub as any).plugin)
+            .expectCalledWith(throttling)
+            .mockReturnValue(octokitMockBuilder);
         });
 
         it('errors if allowed-update-types invalid', async () => {
