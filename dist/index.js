@@ -9729,13 +9729,15 @@ function run() {
                     pr = payload.pull_request;
                     Octokit = utils$2.GitHub.plugin(throttling);
                     octokit = new Octokit(utils$2.getOctokitOptions(token, {
-                        onRateLimit: /* istanbul ignore next */ function (retryAfter) {
-                            core.warning("Hit rate limit. Retrying in " + retryAfter + " seconds");
-                            return true;
-                        },
-                        onAbuseLimit: /* istanbul ignore next */ function (retryAfter) {
-                            core.warning("Hit abuse limit. Retrying in " + retryAfter + " seconds");
-                            return true;
+                        throttle: {
+                            onRateLimit: /* istanbul ignore next */ function (retryAfter) {
+                                core.warning("Hit rate limit. Retrying in " + retryAfter + " seconds");
+                                return true;
+                            },
+                            onAbuseLimit: /* istanbul ignore next */ function (retryAfter) {
+                                core.warning("Hit abuse limit. Retrying in " + retryAfter + " seconds");
+                                return true;
+                            },
                         },
                     }));
                     readPackageJson = function (ref) { return __awaiter(_this, void 0, void 0, function () {

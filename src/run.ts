@@ -74,13 +74,15 @@ export async function run(): Promise<Result> {
   const Octokit = GitHub.plugin(throttling);
   const octokit = new Octokit(
     getOctokitOptions(token, {
-      onRateLimit: /* istanbul ignore next */ (retryAfter: number) => {
-        core.warning(`Hit rate limit. Retrying in ${retryAfter} seconds`);
-        return true;
-      },
-      onAbuseLimit: /* istanbul ignore next */ (retryAfter: number) => {
-        core.warning(`Hit abuse limit. Retrying in ${retryAfter} seconds`);
-        return true;
+      throttle: {
+        onRateLimit: /* istanbul ignore next */ (retryAfter: number) => {
+          core.warning(`Hit rate limit. Retrying in ${retryAfter} seconds`);
+          return true;
+        },
+        onAbuseLimit: /* istanbul ignore next */ (retryAfter: number) => {
+          core.warning(`Hit abuse limit. Retrying in ${retryAfter} seconds`);
+          return true;
+        },
       },
     })
   );

@@ -343,13 +343,12 @@ describe('run', () => {
 
           const getOctokitOptionsReturn = Symbol('getOctokitOptionsReturn');
           when((githubUtils as any).getOctokitOptions)
-            .expectCalledWith(
-              'token',
-              expect.objectContaining({
+            .expectCalledWith('token', {
+              throttle: expect.objectContaining({
                 onRateLimit: expect.any(Function),
                 onAbuseLimit: expect.any(Function),
-              })
-            )
+              }),
+            })
             .mockReturnValue(getOctokitOptionsReturn);
 
           const octokitMockBuilder = jest.fn();
