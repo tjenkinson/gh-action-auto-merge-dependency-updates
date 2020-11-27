@@ -141,7 +141,7 @@ export async function run(): Promise<Result> {
 
       const delay = retryDelays[Math.min(retryDelays.length - 1, i)];
       core.info(`Retry in ${delay} ms`);
-      await new Promise((resolve) => setTimeout(() => resolve(), delay));
+      await new Promise<void>((resolve) => setTimeout(() => resolve(), delay));
     }
     core.error('Timed out');
     throw new Error('Timed out');
