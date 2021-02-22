@@ -1,8 +1,7 @@
 name: Test Action
 
 on:
-  - pull_request
-  - pull_request_review
+  - pull_request_target
 
 jobs:
   run:
@@ -13,5 +12,5 @@ jobs:
       - uses: ./
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          allowed-actors: tjenkinson, dependabot-preview[bot], dependabot[bot]
+          allowed-actors: tjenkinson, dependabot[bot]
           package-block-list: '@actions/core, @actions/github'

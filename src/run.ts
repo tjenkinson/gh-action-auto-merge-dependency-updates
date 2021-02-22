@@ -19,7 +19,9 @@ export async function run(): Promise<Result> {
   core.debug(JSON.stringify(context, null, 2));
 
   if (
-    !['pull_request', 'pull_request_review'].includes(github.context.eventName)
+    !['pull_request', 'pull_request_target', 'pull_request_review'].includes(
+      github.context.eventName
+    )
   ) {
     core.error(`Unsupported event name: ${github.context.eventName}`);
     return Result.UnknownEvent;

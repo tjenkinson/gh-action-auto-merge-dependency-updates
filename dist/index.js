@@ -10513,7 +10513,7 @@ function run() {
                     core.info('Starting');
                     context = github.context;
                     core.debug(JSON.stringify(context, null, 2));
-                    if (!['pull_request', 'pull_request_review'].includes(github.context.eventName)) {
+                    if (!['pull_request', 'pull_request_target', 'pull_request_review'].includes(github.context.eventName)) {
                         core.error("Unsupported event name: " + github.context.eventName);
                         return [2 /*return*/, Result.UnknownEvent];
                     }
