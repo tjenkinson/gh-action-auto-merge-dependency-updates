@@ -153,7 +153,7 @@ export async function run(): Promise<Result> {
     octokit.repos.getCommit({
       owner: context.repo.owner,
       repo: context.repo.repo,
-      ref: context.ref,
+      ref: pr.head.sha,
     });
 
   const getPR = () =>
