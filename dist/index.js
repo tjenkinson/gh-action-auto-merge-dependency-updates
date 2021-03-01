@@ -3983,7 +3983,7 @@ function withDefaults$2(request$1, newDefaults) {
     });
 }
 
-const graphql$1 = withDefaults$2(request, {
+withDefaults$2(request, {
     headers: {
         "user-agent": `octokit-graphql.js/${VERSION$2} ${getUserAgent()}`,
     },
@@ -5698,7 +5698,7 @@ exports.getOctokit = getOctokit;
 
 var light = createCommonjsModule(function (module, exports) {
 (function (global, factory) {
-	 module.exports = factory() ;
+	module.exports = factory() ;
 }(commonjsGlobal, (function () {
 	var commonjsGlobal$1 = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof commonjsGlobal !== 'undefined' ? commonjsGlobal : typeof self !== 'undefined' ? self : {};
 
@@ -5924,13 +5924,12 @@ var light = createCommonjsModule(function (module, exports) {
 
 	Queues = class Queues {
 	  constructor(num_priorities) {
-	    var i;
 	    this.Events = new Events$1(this);
 	    this._length = 0;
 	    this._lists = (function() {
 	      var j, ref, results;
 	      results = [];
-	      for (i = j = 1, ref = num_priorities; (1 <= ref ? j <= ref : j >= ref); i = 1 <= ref ? ++j : --j) {
+	      for (j = 1, ref = num_priorities; (1 <= ref ? j <= ref : j >= ref); 1 <= ref ? ++j : --j) {
 	        results.push(new DLList$1((() => {
 	          return this.incr();
 	        }), (() => {
@@ -7216,7 +7215,7 @@ var light = createCommonjsModule(function (module, exports) {
 })));
 });
 
-const VERSION$6 = "3.3.4";
+const VERSION$6 = "3.4.1";
 
 const noop = () => Promise.resolve();
 // @ts-ignore
@@ -7267,6 +7266,7 @@ async function doRequest(state, request, options) {
 
 var triggersNotificationPaths = [
     "/orgs/{org}/invitations",
+    "/orgs/{org}/invitations/{invitation_id}",
     "/orgs/{org}/teams/{team_slug}/discussions",
     "/orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments",
     "/repos/{owner}/{repo}/collaborators/{username}",
@@ -7288,8 +7288,8 @@ var triggersNotificationPaths = [
 function routeMatcher(paths) {
     // EXAMPLE. For the following paths:
     /* [
-        "/orgs/:org/invitations",
-        "/repos/:owner/:repo/collaborators/:username"
+        "/orgs/{org}/invitations",
+        "/repos/{owner}/{repo}/collaborators/{username}"
     ] */
     // @ts-ignore
     const regexes = paths.map((path) => path
@@ -7466,16 +7466,16 @@ var utils$3 = createCommonjsModule(function (module, exports) {
     return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
   };
 
-  var isDate = exports.isDate = function isDate(d) {
+  exports.isDate = function isDate(d) {
     return d instanceof Date;
   };
-  var isEmpty = exports.isEmpty = function isEmpty(o) {
+  exports.isEmpty = function isEmpty(o) {
     return Object.keys(o).length === 0;
   };
   var isObject = exports.isObject = function isObject(o) {
     return o != null && (typeof o === 'undefined' ? 'undefined' : _typeof(o)) === 'object';
   };
-  var properObject = exports.properObject = function properObject(o) {
+  exports.properObject = function properObject(o) {
     return isObject(o) && !o.hasOwnProperty ? _extends({}, o) : o;
   };
 });
@@ -9063,7 +9063,7 @@ class LRUCache {
     if (options.max && (typeof options.max !== 'number' || options.max < 0))
       throw new TypeError('max must be a non-negative number')
     // Kind of weird to have a default max of Infinity, but oh well.
-    const max = this[MAX] = options.max || Infinity;
+    this[MAX] = options.max || Infinity;
 
     const lc = options.length || naiveLength;
     this[LENGTH_CALCULATOR] = (typeof lc !== 'function') ? naiveLength : lc;
@@ -9486,7 +9486,7 @@ class Range {
     // if any comparators are the null set, then replace with JUST null set
     // if more than one comparator, remove any * comparators
     // also, don't include the same comparator more than once
-    const l = rangeList.length;
+    rangeList.length;
     const rangeMap = new Map();
     for (const comp of rangeList) {
       if (isNullSet(comp))
@@ -10504,7 +10504,7 @@ var retryDelays = [1, 1, 1, 2, 3, 4, 5, 10, 20, 40, 60].map(function (a) { retur
 var timeout = 6 * 60 * 60 * 1000;
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var startTime, context, payload, token, allowedActors, allowedUpdateTypes, approve, packageBlockList, pr, Octokit, octokit, readPackageJson, mergeWhenPossible, getCommit, getPR, approvePR, validVersionChange, commit, onlyPackageJsonChanged, base, packageJsonBase, packageJsonPr, diff, allowedPropsChanges, allowedChange, result;
+        var startTime, context, payload, token, allowedActors, allowedUpdateTypes, approve, packageBlockList, pr, Octokit, octokit, readPackageJson, mergeWhenPossible, getCommit, getPR, approvePR, validVersionChange, commit, onlyPackageJsonChanged, packageJsonBase, packageJsonPr, diff, allowedPropsChanges, allowedChange, result;
         var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -10666,7 +10666,7 @@ function run() {
                         return octokit.repos.getCommit({
                             owner: context.repo.owner,
                             repo: context.repo.repo,
-                            ref: context.ref,
+                            ref: pr.head.sha,
                         });
                     };
                     getPR = function () {
@@ -10745,11 +10745,10 @@ function run() {
                         return [2 /*return*/, Result.FileNotAllowed];
                     }
                     core.info('Retrieving package.json');
-                    base = pr.base;
-                    return [4 /*yield*/, readPackageJson(base.ref)];
+                    return [4 /*yield*/, readPackageJson(pr.base.sha)];
                 case 2:
                     packageJsonBase = _a.sent();
-                    return [4 /*yield*/, readPackageJson(context.ref)];
+                    return [4 /*yield*/, readPackageJson(pr.head.sha)];
                 case 3:
                     packageJsonPr = _a.sent();
                     core.info('Calculating diff');
