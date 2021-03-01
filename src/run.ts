@@ -153,7 +153,7 @@ export async function run(): Promise<Result> {
     octokit.repos.getCommit({
       owner: context.repo.owner,
       repo: context.repo.repo,
-      ref: context.ref,
+      ref: pr.head.sha,
     });
 
   const getPR = () =>
@@ -230,9 +230,8 @@ export async function run(): Promise<Result> {
   }
 
   core.info('Retrieving package.json');
-  const base = pr.base;
-  const packageJsonBase = await readPackageJson(base.ref);
-  const packageJsonPr = await readPackageJson(context.ref);
+  const packageJsonBase = await readPackageJson(pr.base.sha);
+  const packageJsonPr = await readPackageJson(pr.head.sha);
 
   core.info('Calculating diff');
   const diff: any = detailedDiff(packageJsonBase, packageJsonPr);
