@@ -216,12 +216,14 @@ describe('run', () => {
               owner: 'repoOwner',
               repo: 'repo ',
             };
-            (github.context as any).ref = 'ref';
             (github.context as any).payload = {
               pull_request: {
                 number: 1,
                 base: {
-                  ref: 'baseRef',
+                  sha: 'baseSha',
+                },
+                head: {
+                  sha: 'headSha',
                 },
               },
             };
@@ -245,7 +247,7 @@ describe('run', () => {
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
                 path: 'package.json',
-                ref: github.context.ref,
+                ref: (github.context.payload.pull_request as any).head.sha,
               })
               .mockImplementation(() =>
                 Promise.resolve({
@@ -262,7 +264,7 @@ describe('run', () => {
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
                 path: 'package.json',
-                ref: (github.context.payload.pull_request as any).base.ref,
+                ref: (github.context.payload.pull_request as any).base.sha,
               })
               .mockImplementation(() =>
                 Promise.resolve({
@@ -281,7 +283,7 @@ describe('run', () => {
               .expectCalledWith({
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
-                ref: github.context.ref,
+                ref: (github.context.payload.pull_request as any).head.sha,
               })
               .mockImplementation(() => mockCommit);
 
