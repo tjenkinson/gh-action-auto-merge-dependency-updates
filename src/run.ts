@@ -231,8 +231,8 @@ export async function run(): Promise<Result> {
 
   core.info('Retrieving package.json');
   const base = pr.base;
-  const packageJsonBase = await readPackageJson(base.ref);
-  const packageJsonPr = await readPackageJson(context.ref);
+  const packageJsonBase = await readPackageJson(base.sha);
+  const packageJsonPr = await readPackageJson(context.sha);
 
   core.info('Calculating diff');
   const diff: any = detailedDiff(packageJsonBase, packageJsonPr);
