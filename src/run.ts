@@ -281,6 +281,8 @@ export async function run(): Promise<Result> {
     return Result.VersionChangeNotAllowed;
   }
 
+  core.setOutput('success', 'true');
+
   if (approve) {
     core.info('Approving PR');
     await approvePR();

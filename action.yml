@@ -17,6 +17,9 @@ inputs:
   package-block-list:
     required: false
     description: 'Comma separated list of packages that auto merge should not be allowed for'
+outputs:
+  success:
+    description: '"true" if the commit meets the criteria'
 runs:
   using: 'node12'
   main: 'dist/index.js'
