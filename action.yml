@@ -14,15 +14,9 @@ inputs:
   approve:
     description: 'Automatically approve the PR if it qualifies for auto merge'
     default: 'true'
-  merge:
-    description: 'Merge the PR if it qualifies'
-    default: 'true'
   package-block-list:
     required: false
     description: 'Comma separated list of packages that auto merge should not be allowed for'
-outputs:
-  success:
-    description: '"true" if the commit meets the criteria'
 runs:
   using: 'node12'
   main: 'dist/index.js'
