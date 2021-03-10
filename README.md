@@ -18,6 +18,9 @@ It currently supports npm and yarn.
 
 You should configure this action to run on the `pull_request_target` event. If you use `pull_request` you must provide a custom `repo-token` which has permission to merge. [The default token for dependabot PRs only has read-only access](https://github.blog/changelog/2021-02-19-github-actions-workflows-triggered-by-dependabot-prs-will-run-with-read-only-permissions/).
 
+## Outputs
+A `success` output is set to `true` if a commit is eligible for auto merge.
+
 ## Example Action
 
 ```yaml

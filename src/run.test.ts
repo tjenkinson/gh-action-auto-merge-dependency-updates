@@ -168,6 +168,7 @@ describe('run', () => {
           mockApprove = '';
           mockPackageBlockList = '';
 
+          (core.setOutput as any).mockReset();
           const getInputMock = when(core.getInput as any).mockImplementation(
             () => {
               throw new Error('Unexpected call');
@@ -236,7 +237,13 @@ describe('run', () => {
                 ],
               },
             };
-            mockPr = {};
+            mockPr = {
+              data: {
+                state: 'open',
+                mergeable: true,
+                head: { sha: mockSha },
+              },
+            };
 
             reposGetContentMock = jest.fn();
             when(reposGetContentMock)
@@ -498,19 +505,27 @@ describe('run', () => {
                           Result.VersionChangeNotAllowed
                         );
                       });
+
+                      it('does not set the "success" output', async () => {
+                        await run();
+                        expect(core.setOutput).not.toHaveBeenCalledWith(
+                          'success',
+                          'true'
+                        );
+                      });
                     } else {
+                      it('sets the "success" output', async () => {
+                        await run();
+                        expect(core.setOutput).toHaveBeenCalledWith(
+                          'success',
+                          'true'
+                        );
+                      });
+
                       [true, false].forEach((approve) => {
                         describe(`when approve option is ${
                           approve ? 'enabled' : 'disabled'
                         }`, () => {
-                          beforeEach(() => {
-                            mockPr.data = {
-                              state: 'open',
-                              mergeable: true,
-                              head: { sha: mockSha },
-                            };
-                          });
-
                           if (approve) {
                             it('approves the PR', async () => {
                               mockApprove = 'true';
