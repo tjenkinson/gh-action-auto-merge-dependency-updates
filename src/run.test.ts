@@ -159,7 +159,6 @@ describe('run', () => {
         let mockAllowedActors: string;
         let mockAllowedUpdateTypes: string;
         let mockApprove: string;
-        let mockMerge: string;
         let mockPackageBlockList: string;
 
         beforeEach(() => {
@@ -167,10 +166,8 @@ describe('run', () => {
           mockAllowedActors = '';
           mockAllowedUpdateTypes = '';
           mockApprove = '';
-          mockMerge = '';
           mockPackageBlockList = '';
 
-          (core.setOutput as any).mockReset();
           const getInputMock = when(core.getInput as any).mockImplementation(
             () => {
               throw new Error('Unexpected call');
@@ -191,7 +188,6 @@ describe('run', () => {
           getInputMock
             .calledWith('package-block-list')
             .mockImplementation(() => mockPackageBlockList);
-          getInputMock.calledWith('merge').mockImplementation(() => mockMerge);
         });
 
         it('stops if the actor is not in the allow list', async () => {
@@ -240,13 +236,7 @@ describe('run', () => {
                 ],
               },
             };
-            mockPr = {
-              data: {
-                state: 'open',
-                mergeable: true,
-                head: { sha: mockSha },
-              },
-            };
+            mockPr = {};
 
             reposGetContentMock = jest.fn();
             when(reposGetContentMock)
@@ -508,144 +498,124 @@ describe('run', () => {
                           Result.VersionChangeNotAllowed
                         );
                       });
-
-                      it('does not set the "success" output', async () => {
-                        await run();
-                        expect(core.setOutput).not.toHaveBeenCalledWith(
-                          'success',
-                          'true'
-                        );
-                      });
                     } else {
-                      it('sets the "success" output', async () => {
-                        await run();
-                        expect(core.setOutput).toHaveBeenCalledWith(
-                          'success',
-                          'true'
-                        );
-                      });
-
                       [true, false].forEach((approve) => {
                         describe(`when approve option is ${
                           approve ? 'enabled' : 'disabled'
                         }`, () => {
+                          beforeEach(() => {
+                            mockPr.data = {
+                              state: 'open',
+                              mergeable: true,
+                              head: { sha: mockSha },
+                            };
+                          });
+
                           if (approve) {
                             it('approves the PR', async () => {
                               mockApprove = 'true';
-                              expect(await run()).toBe(Result.PRMergeSkipped);
+                              expect(await run()).toBe(Result.Success);
                             });
                           } else {
                             it('does not approve the PR', async () => {
-                              expect(await run()).toBe(Result.PRMergeSkipped);
+                              expect(await run()).toBe(Result.Success);
                               expect(reviewSubmitted).toBe(false);
                             });
                           }
 
-                          describe('when merge option is disabled', () => {
-                            it('completes and does not merge the PR', async () => {
-                              expect(await run()).toBe(Result.PRMergeSkipped);
-                            });
+                          it('merges the PR', async () => {
+                            expect(await run()).toBe(Result.Success);
                           });
 
-                          describe('when merge option is enabled', () => {
-                            beforeEach(() => {
-                              mockMerge = 'true';
+                          it('aborts if the PR is not open', async () => {
+                            mockPr.data.state = 'unknown';
+                            expect(await run()).toBe(Result.PRNotOpen);
+                          });
+
+                          it('waits 1 second if the PR is not mergeable then retries', async () => {
+                            let resolved = false;
+                            let error: any;
+
+                            mockPr.data.mergeable = false;
+                            const result = run();
+                            result
+                              .then(() => (resolved = true))
+                              .catch((e) => (error = e));
+                            await whenAllPromisesFinished();
+                            expect(error).toBeUndefined();
+                            expect(resolved).toBe(false);
+
+                            mockPr.data.mergeable = true;
+                            jest.advanceTimersByTime(999);
+                            await whenAllPromisesFinished();
+                            expect(resolved).toBe(false);
+
+                            jest.advanceTimersByTime(1);
+                            await whenAllPromisesFinished();
+                            expect(resolved).toBe(true);
+
+                            expect(await result).toBe(Result.Success);
+                          });
+
+                          it('waits 1 second if the PR fails to merge and then retries', async () => {
+                            let resolved = false;
+                            let error: any;
+
+                            validMergeCallMock.mockImplementationOnce(() => {
+                              throw new Error('Oops');
                             });
 
-                            it('merges the PR', async () => {
-                              expect(await run()).toBe(Result.PRMerged);
+                            const result = run();
+                            result
+                              .then(() => (resolved = true))
+                              .catch((e) => (error = e));
+                            await whenAllPromisesFinished();
+                            expect(error).toBeUndefined();
+                            expect(resolved).toBe(false);
+
+                            jest.advanceTimersByTime(999);
+                            await whenAllPromisesFinished();
+                            expect(resolved).toBe(false);
+
+                            jest.advanceTimersByTime(1);
+                            await whenAllPromisesFinished();
+                            expect(resolved).toBe(true);
+
+                            expect(await result).toBe(Result.Success);
+                          });
+
+                          it('stops if the merge fails because the head changed', async () => {
+                            validMergeCallMock.mockImplementation(() => {
+                              throw { status: 409 };
                             });
 
-                            it('aborts if the PR is not open', async () => {
-                              mockPr.data.state = 'unknown';
-                              expect(await run()).toBe(Result.PRNotOpen);
+                            expect(await run()).toBe(Result.PRHeadChanged);
+                          });
+
+                          it('throws when it has retried for 6 hours', async () => {
+                            let rejected = false;
+                            let error: any;
+
+                            mockPr.data.mergeable = false;
+                            const result = run();
+                            result.catch((e) => {
+                              rejected = true;
+                              error = e;
                             });
+                            await whenAllPromisesFinished();
+                            expect(error).toBeUndefined();
+                            expect(rejected).toBe(false);
 
-                            it('waits 1 second if the PR is not mergeable then retries', async () => {
-                              let resolved = false;
-                              let error: any;
+                            jest.runOnlyPendingTimers();
+                            await whenAllPromisesFinished();
+                            expect(rejected).toBe(false);
 
-                              mockPr.data.mergeable = false;
-                              const result = run();
-                              result
-                                .then(() => (resolved = true))
-                                .catch((e) => (error = e));
-                              await whenAllPromisesFinished();
-                              expect(error).toBeUndefined();
-                              expect(resolved).toBe(false);
+                            jest.setSystemTime(6 * 60 * 60 * 1000);
+                            jest.runOnlyPendingTimers();
+                            await whenAllPromisesFinished();
 
-                              mockPr.data.mergeable = true;
-                              jest.advanceTimersByTime(999);
-                              await whenAllPromisesFinished();
-                              expect(resolved).toBe(false);
-
-                              jest.advanceTimersByTime(1);
-                              await whenAllPromisesFinished();
-                              expect(resolved).toBe(true);
-
-                              expect(await result).toBe(Result.PRMerged);
-                            });
-
-                            it('waits 1 second if the PR fails to merge and then retries', async () => {
-                              let resolved = false;
-                              let error: any;
-
-                              validMergeCallMock.mockImplementationOnce(() => {
-                                throw new Error('Oops');
-                              });
-
-                              const result = run();
-                              result
-                                .then(() => (resolved = true))
-                                .catch((e) => (error = e));
-                              await whenAllPromisesFinished();
-                              expect(error).toBeUndefined();
-                              expect(resolved).toBe(false);
-
-                              jest.advanceTimersByTime(999);
-                              await whenAllPromisesFinished();
-                              expect(resolved).toBe(false);
-
-                              jest.advanceTimersByTime(1);
-                              await whenAllPromisesFinished();
-                              expect(resolved).toBe(true);
-
-                              expect(await result).toBe(Result.PRMerged);
-                            });
-
-                            it('stops if the merge fails because the head changed', async () => {
-                              validMergeCallMock.mockImplementation(() => {
-                                throw { status: 409 };
-                              });
-
-                              expect(await run()).toBe(Result.PRHeadChanged);
-                            });
-
-                            it('throws when it has retried for 6 hours', async () => {
-                              let rejected = false;
-                              let error: any;
-
-                              mockPr.data.mergeable = false;
-                              const result = run();
-                              result.catch((e) => {
-                                rejected = true;
-                                error = e;
-                              });
-                              await whenAllPromisesFinished();
-                              expect(error).toBeUndefined();
-                              expect(rejected).toBe(false);
-
-                              jest.runOnlyPendingTimers();
-                              await whenAllPromisesFinished();
-                              expect(rejected).toBe(false);
-
-                              jest.setSystemTime(6 * 60 * 60 * 1000);
-                              jest.runOnlyPendingTimers();
-                              await whenAllPromisesFinished();
-
-                              expect(rejected).toBe(true);
-                              expect(error?.message).toBe('Timed out');
-                            });
+                            expect(rejected).toBe(true);
+                            expect(error?.message).toBe('Timed out');
                           });
                         });
                       });
