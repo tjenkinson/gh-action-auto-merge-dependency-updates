@@ -71,6 +71,8 @@ export async function run(): Promise<Result> {
     return Result.ActorNotAllowed;
   }
 
+  const merge = core.getInput('merge') === 'true';
+
   const pr = payload.pull_request;
 
   const Octokit = GitHub.plugin(throttling);
@@ -105,7 +107,7 @@ export async function run(): Promise<Result> {
   };
 
   const mergeWhenPossible = async (): Promise<
-    Result.PRNotOpen | Result.PRHeadChanged | Result.Success
+    Result.PRNotOpen | Result.PRHeadChanged | Result.PRMerged
   > => {
     for (let i = 0; ; i++) {
       core.info(`Attempt: ${i}`);
@@ -126,7 +128,7 @@ export async function run(): Promise<Result> {
             sha: pr.head.sha,
           });
           core.info('Merged');
-          return Result.Success;
+          return Result.PRMerged;
         } catch (e) {
           if (e.status && e.status === 409) {
             core.error('Failed to merge. PR head changed');
@@ -288,8 +290,11 @@ export async function run(): Promise<Result> {
     await approvePR();
   }
 
-  core.info('Merging when possible');
-  const result = await mergeWhenPossible();
+  let result = Result.PRMergeSkipped;
+  if (merge) {
+    core.info('Merging when possible');
+    result = await mergeWhenPossible();
+  }
   core.info('Finished!');
   return result;
 }
