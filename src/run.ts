@@ -71,6 +71,8 @@ export async function run(): Promise<Result> {
     return Result.ActorNotAllowed;
   }
 
+  const merge = core.getInput('merge') === 'true';
+
   const pr = payload.pull_request;
 
   const Octokit = GitHub.plugin(throttling);
@@ -105,16 +107,17 @@ export async function run(): Promise<Result> {
   };
 
   const mergeWhenPossible = async (): Promise<
-    Result.PRNotOpen | Result.PRHeadChanged | Result.Success
+    Result.PRNotOpen | Result.PRHeadChanged | Result.PRMerged
   > => {
     for (let i = 0; ; i++) {
       core.info(`Attempt: ${i}`);
-      const prData = await getPR();
-      if (prData.data.state !== 'open') {
+      const livePR = await getPR();
+      core.debug(JSON.stringify(livePR, null, 2));
+      if (livePR.data.state !== 'open') {
         core.error('PR is not open');
         return Result.PRNotOpen;
       }
-      const mergeable = prData.data.mergeable;
+      const mergeable = livePR.data.mergeable;
       if (mergeable) {
         try {
           core.info('Attempting merge');
@@ -122,10 +125,10 @@ export async function run(): Promise<Result> {
             owner: context.repo.owner,
             repo: context.repo.repo,
             pull_number: pr.number,
-            sha: prData.data.head.sha,
+            sha: pr.head.sha,
           });
           core.info('Merged');
-          return Result.Success;
+          return Result.PRMerged;
         } catch (e) {
           if (e.status && e.status === 409) {
             core.error('Failed to merge. PR head changed');
@@ -149,15 +152,15 @@ export async function run(): Promise<Result> {
     throw new Error('Timed out');
   };
 
-  const getCommit = () =>
-    octokit.repos.getCommit({
-      owner: context.repo.owner,
-      repo: context.repo.repo,
-      ref: pr.head.sha,
-    });
-
   const getPR = () =>
     octokit.pulls.get({
+      owner: context.repo.owner,
+      repo: context.repo.repo,
+      pull_number: pr.number,
+    });
+
+  const getPRFiles = () =>
+    octokit.pulls.listFiles({
       owner: context.repo.owner,
       repo: context.repo.repo,
       pull_number: pr.number,
@@ -168,6 +171,7 @@ export async function run(): Promise<Result> {
       owner: context.repo.owner,
       repo: context.repo.repo,
       pull_number: pr.number,
+      commit_id: pr.head.sha,
     });
     await octokit.pulls.submitReview({
       owner: context.repo.owner,
@@ -217,9 +221,10 @@ export async function run(): Promise<Result> {
     return allowed.includes(semver.diff(oldVersionExact, newVersionExact));
   };
 
-  core.info('Getting commit info');
-  const commit = await getCommit();
-  const onlyPackageJsonChanged = commit.data.files.every(
+  core.info('Getting PR files');
+  const prFiles = await getPRFiles();
+  core.debug(JSON.stringify(prFiles, null, 2));
+  const onlyPackageJsonChanged = prFiles.data.every(
     ({ filename, status }) =>
       ['package.json', 'package-lock.json', 'yarn.lock'].includes(filename) &&
       status === 'modified'
@@ -278,13 +283,18 @@ export async function run(): Promise<Result> {
     return Result.VersionChangeNotAllowed;
   }
 
+  core.setOutput('success', 'true');
+
   if (approve) {
     core.info('Approving PR');
     await approvePR();
   }
 
-  core.info('Merging when possible');
-  const result = await mergeWhenPossible();
+  let result = Result.PRMergeSkipped;
+  if (merge) {
+    core.info('Merging when possible');
+    result = await mergeWhenPossible();
+  }
   core.info('Finished!');
   return result;
 }

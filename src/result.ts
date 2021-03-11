@@ -7,5 +7,6 @@ export enum Result {
   VersionChangeNotAllowed,
   PRNotOpen,
   PRHeadChanged,
-  Success,
+  PRMerged,
+  PRMergeSkipped,
 }
