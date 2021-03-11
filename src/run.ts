@@ -150,15 +150,15 @@ export async function run(): Promise<Result> {
     throw new Error('Timed out');
   };
 
-  const getCommit = () =>
-    octokit.repos.getCommit({
-      owner: context.repo.owner,
-      repo: context.repo.repo,
-      ref: pr.head.sha,
-    });
-
   const getPR = () =>
     octokit.pulls.get({
+      owner: context.repo.owner,
+      repo: context.repo.repo,
+      pull_number: pr.number,
+    });
+
+  const getPRFiles = () =>
+    octokit.pulls.listFiles({
       owner: context.repo.owner,
       repo: context.repo.repo,
       pull_number: pr.number,
@@ -219,9 +219,10 @@ export async function run(): Promise<Result> {
     return allowed.includes(semver.diff(oldVersionExact, newVersionExact));
   };
 
-  core.info('Getting commit info');
-  const commit = await getCommit();
-  const onlyPackageJsonChanged = commit.data.files.every(
+  core.info('Getting PR files');
+  const prFiles = await getPRFiles();
+  core.debug(JSON.stringify(prFiles, null, 2));
+  const onlyPackageJsonChanged = prFiles.data.every(
     ({ filename, status }) =>
       ['package.json', 'package-lock.json', 'yarn.lock'].includes(filename) &&
       status === 'modified'

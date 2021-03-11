@@ -198,7 +198,7 @@ describe('run', () => {
         describe('with an allowed actor', () => {
           let mockPackageJsonPr: any;
           let mockPackageJsonBase: any;
-          let mockCommit: any;
+          let mockListFiles: any;
           let mockPr: any;
           let reviewSubmitted: boolean;
           let reposGetContentMock: jest.Mock;
@@ -227,14 +227,12 @@ describe('run', () => {
                 },
               },
             };
-            mockCommit = {
-              data: {
-                files: [
-                  { filename: 'package.json', status: 'modified' },
-                  { filename: 'package-lock.json', status: 'modified' },
-                  { filename: 'yarn.lock', status: 'modified' },
-                ],
-              },
+            mockListFiles = {
+              data: [
+                { filename: 'package.json', status: 'modified' },
+                { filename: 'package-lock.json', status: 'modified' },
+                { filename: 'yarn.lock', status: 'modified' },
+              ],
             };
             mockPr = {};
 
@@ -278,15 +276,6 @@ describe('run', () => {
                 })
               );
 
-            const reposGetCommitMock = jest.fn();
-            when(reposGetCommitMock)
-              .expectCalledWith({
-                owner: github.context.repo.owner,
-                repo: github.context.repo.repo,
-                ref: (github.context.payload.pull_request as any).head.sha,
-              })
-              .mockImplementation(() => mockCommit);
-
             const pullsGetMock = jest.fn();
             when(pullsGetMock)
               .expectCalledWith({
@@ -296,6 +285,16 @@ describe('run', () => {
               })
               .mockImplementation(() => mockPr);
 
+            const pullsListFilesMock = jest.fn();
+            when(pullsListFilesMock)
+              .expectCalledWith({
+                owner: github.context.repo.owner,
+                repo: github.context.repo.repo,
+                pull_number: github.context.payload.pull_request!.number,
+              })
+              .mockImplementation(() => mockListFiles);
+
+
             const mockReviewId = 'mockReviewId';
             const createReviewMock = jest.fn();
             when(createReviewMock)
@@ -303,6 +302,7 @@ describe('run', () => {
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
                 pull_number: github.context.payload.pull_request!.number,
+                commit_id: mockSha,
               })
               .mockReturnValue(Promise.resolve({ data: { id: mockReviewId } }));
 
@@ -334,10 +334,10 @@ describe('run', () => {
             const octokitMock = {
               repos: {
                 getContent: reposGetContentMock,
-                getCommit: reposGetCommitMock,
               },
               pulls: {
                 get: pullsGetMock,
+                listFiles: pullsListFilesMock,
                 createReview: createReviewMock,
                 submitReview: submitReviewMock,
                 merge: mergeMock,
@@ -393,12 +393,12 @@ describe('run', () => {
           });
 
           it('stops if more than the allowed files change', async () => {
-            mockCommit.data.files = [
+            mockListFiles.data = [
               { filename: 'something', status: 'modified' },
             ];
             expect(await run()).toBe(Result.FileNotAllowed);
 
-            mockCommit.data.files = [
+            mockListFiles.data = [
               { filename: 'package.json', status: 'modified' },
               { filename: 'something', status: 'modified' },
             ];
@@ -406,7 +406,7 @@ describe('run', () => {
           });
 
           it('stops if an allowed file is changed but not modified', async () => {
-            mockCommit.data.files = [
+            mockListFiles.data = [
               { filename: 'package.json', status: 'something' },
             ];
             expect(await run()).toBe(Result.FileNotAllowed);
