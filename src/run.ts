@@ -169,6 +169,7 @@ export async function run(): Promise<Result> {
       owner: context.repo.owner,
       repo: context.repo.repo,
       pull_number: pr.number,
+      commit_id: pr.head.sha,
     });
     await octokit.pulls.submitReview({
       owner: context.repo.owner,
