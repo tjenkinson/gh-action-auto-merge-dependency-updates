@@ -203,7 +203,7 @@ describe('run', () => {
           let reviewSubmitted: boolean;
           let reposGetContentMock: jest.Mock;
           let validMergeCallMock: jest.Mock;
-          const mockSha = 'mockSha';
+          const mockSha = 'headSha';
 
           beforeEach(() => {
             mockAllowedActors = 'actor1, actor2';
@@ -223,7 +223,7 @@ describe('run', () => {
                   sha: 'baseSha',
                 },
                 head: {
-                  sha: 'headSha',
+                  sha: mockSha,
                 },
               },
             };
