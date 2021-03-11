@@ -109,12 +109,13 @@ export async function run(): Promise<Result> {
   > => {
     for (let i = 0; ; i++) {
       core.info(`Attempt: ${i}`);
-      const prData = await getPR();
-      if (prData.data.state !== 'open') {
+      const livePR = await getPR();
+      core.debug(JSON.stringify(livePR, null, 2));
+      if (livePR.data.state !== 'open') {
         core.error('PR is not open');
         return Result.PRNotOpen;
       }
-      const mergeable = prData.data.mergeable;
+      const mergeable = livePR.data.mergeable;
       if (mergeable) {
         try {
           core.info('Attempting merge');
@@ -122,7 +123,7 @@ export async function run(): Promise<Result> {
             owner: context.repo.owner,
             repo: context.repo.repo,
             pull_number: pr.number,
-            sha: prData.data.head.sha,
+            sha: pr.head.sha,
           });
           core.info('Merged');
           return Result.Success;
