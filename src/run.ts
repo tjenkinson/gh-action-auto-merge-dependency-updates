@@ -159,11 +159,12 @@ export async function run(): Promise<Result> {
       pull_number: pr.number,
     });
 
-  const getPRFiles = () =>
-    octokit.pulls.listFiles({
+  const compareCommits = () =>
+    octokit.repos.compareCommits({
       owner: context.repo.owner,
       repo: context.repo.repo,
-      pull_number: pr.number,
+      base: pr.base.sha,
+      head: pr.head.sha,
     });
 
   const approvePR = async () => {
@@ -222,9 +223,9 @@ export async function run(): Promise<Result> {
   };
 
   core.info('Getting PR files');
-  const prFiles = await getPRFiles();
-  core.debug(JSON.stringify(prFiles, null, 2));
-  const onlyPackageJsonChanged = prFiles.data.every(
+  const comparison = await compareCommits();
+  core.debug(JSON.stringify(comparison, null, 2));
+  const onlyPackageJsonChanged = comparison.data.files.every(
     ({ filename, status }) =>
       ['package.json', 'package-lock.json', 'yarn.lock'].includes(filename) &&
       status === 'modified'
