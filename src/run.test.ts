@@ -202,7 +202,7 @@ describe('run', () => {
         describe('with an allowed actor', () => {
           let mockPackageJsonPr: any;
           let mockPackageJsonBase: any;
-          let mockListFiles: any;
+          let mockCompareCommits: any;
           let mockPr: any;
           let reviewSubmitted: boolean;
           let reposGetContentMock: jest.Mock;
@@ -231,12 +231,14 @@ describe('run', () => {
                 },
               },
             };
-            mockListFiles = {
-              data: [
-                { filename: 'package.json', status: 'modified' },
-                { filename: 'package-lock.json', status: 'modified' },
-                { filename: 'yarn.lock', status: 'modified' },
-              ],
+            mockCompareCommits = {
+              data: {
+                files: [
+                  { filename: 'package.json', status: 'modified' },
+                  { filename: 'package-lock.json', status: 'modified' },
+                  { filename: 'yarn.lock', status: 'modified' },
+                ],
+              },
             };
             mockPr = {
               data: {
@@ -295,14 +297,15 @@ describe('run', () => {
               })
               .mockImplementation(() => mockPr);
 
-            const pullsListFilesMock = jest.fn();
-            when(pullsListFilesMock)
+            const reposCompareCommitsMock = jest.fn();
+            when(reposCompareCommitsMock)
               .expectCalledWith({
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
-                pull_number: github.context.payload.pull_request!.number,
+                base: (github.context.payload.pull_request as any).base.sha,
+                head: (github.context.payload.pull_request as any).head.sha,
               })
-              .mockImplementation(() => mockListFiles);
+              .mockImplementation(() => mockCompareCommits);
 
             const mockReviewId = 'mockReviewId';
             const createReviewMock = jest.fn();
@@ -343,10 +346,10 @@ describe('run', () => {
             const octokitMock = {
               repos: {
                 getContent: reposGetContentMock,
+                compareCommits: reposCompareCommitsMock,
               },
               pulls: {
                 get: pullsGetMock,
-                listFiles: pullsListFilesMock,
                 createReview: createReviewMock,
                 submitReview: submitReviewMock,
                 merge: mergeMock,
@@ -402,12 +405,12 @@ describe('run', () => {
           });
 
           it('stops if more than the allowed files change', async () => {
-            mockListFiles.data = [
+            mockCompareCommits.data.files = [
               { filename: 'something', status: 'modified' },
             ];
             expect(await run()).toBe(Result.FileNotAllowed);
 
-            mockListFiles.data = [
+            mockCompareCommits.data.files = [
               { filename: 'package.json', status: 'modified' },
               { filename: 'something', status: 'modified' },
             ];
@@ -415,7 +418,7 @@ describe('run', () => {
           });
 
           it('stops if an allowed file is changed but not modified', async () => {
-            mockListFiles.data = [
+            mockCompareCommits.data.files = [
               { filename: 'package.json', status: 'something' },
             ];
             expect(await run()).toBe(Result.FileNotAllowed);
