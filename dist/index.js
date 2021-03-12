@@ -10505,7 +10505,7 @@ var retryDelays = [1, 1, 1, 2, 3, 4, 5, 10, 20, 40, 60].map(function (a) { retur
 var timeout = 6 * 60 * 60 * 1000;
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var startTime, context, payload, token, allowedActors, allowedUpdateTypes, approve, packageBlockList, merge, pr, Octokit, octokit, readPackageJson, mergeWhenPossible, getPR, getPRFiles, approvePR, validVersionChange, prFiles, onlyPackageJsonChanged, packageJsonBase, packageJsonPr, diff, allowedPropsChanges, allowedChange, result;
+        var startTime, context, payload, token, allowedActors, allowedUpdateTypes, approve, packageBlockList, merge, pr, Octokit, octokit, readPackageJson, mergeWhenPossible, getPR, compareCommits, approvePR, validVersionChange, comparison, onlyPackageJsonChanged, packageJsonBase, packageJsonPr, diff, allowedPropsChanges, allowedChange, result;
         var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -10672,11 +10672,12 @@ function run() {
                             pull_number: pr.number,
                         });
                     };
-                    getPRFiles = function () {
-                        return octokit.pulls.listFiles({
+                    compareCommits = function () {
+                        return octokit.repos.compareCommits({
                             owner: context.repo.owner,
                             repo: context.repo.repo,
-                            pull_number: pr.number,
+                            base: pr.base.sha,
+                            head: pr.head.sha,
                         });
                     };
                     approvePR = function () { return __awaiter(_this, void 0, void 0, function () {
@@ -10736,11 +10737,11 @@ function run() {
                         return allowed.includes(semver.diff(oldVersionExact, newVersionExact));
                     };
                     core.info('Getting PR files');
-                    return [4 /*yield*/, getPRFiles()];
+                    return [4 /*yield*/, compareCommits()];
                 case 1:
-                    prFiles = _a.sent();
-                    core.debug(JSON.stringify(prFiles, null, 2));
-                    onlyPackageJsonChanged = prFiles.data.every(function (_a) {
+                    comparison = _a.sent();
+                    core.debug(JSON.stringify(comparison, null, 2));
+                    onlyPackageJsonChanged = comparison.data.files.every(function (_a) {
                         var filename = _a.filename, status = _a.status;
                         return ['package.json', 'package-lock.json', 'yarn.lock'].includes(filename) &&
                             status === 'modified';
