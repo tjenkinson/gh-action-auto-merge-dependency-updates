@@ -1,6 +1,6 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
-import * as Webhooks from '@octokit/webhooks';
+import { EmitterWebhookEvent } from '@octokit/webhooks';
 import { GitHub, getOctokitOptions } from '@actions/github/lib/utils';
 import { throttling } from '@octokit/plugin-throttling';
 import { detailedDiff } from 'deep-object-diff';
@@ -26,10 +26,9 @@ export async function run(): Promise<Result> {
     core.error(`Unsupported event name: ${github.context.eventName}`);
     return Result.UnknownEvent;
   }
-  const payload:
-    | Webhooks.EventPayloads.WebhookPayloadPullRequest
-    | Webhooks.EventPayloads.WebhookPayloadPullRequestReview = github.context
-    .payload as any;
+  const payload: EmitterWebhookEvent<
+    'pull_request' | 'pull_request_review'
+  >['payload'] = github.context.payload as any;
 
   const token = core.getInput('repo-token', { required: true });
 
