@@ -427,7 +427,7 @@ function getState(name) {
     return process.env[`STATE_${name}`] || '';
 }
 exports.getState = getState;
-
+//# sourceMappingURL=core.js.map
 });
 
 /*! *****************************************************************************
@@ -532,7 +532,7 @@ class Context {
     }
 }
 exports.Context = Context;
-
+//# sourceMappingURL=context.js.map
 });
 
 function getProxyUrl(reqUrl) {
@@ -1435,7 +1435,7 @@ function getApiBaseUrl() {
     return process.env['GITHUB_API_URL'] || 'https://api.github.com';
 }
 exports.getApiBaseUrl = getApiBaseUrl;
-
+//# sourceMappingURL=utils.js.map
 });
 
 function getUserAgent() {
@@ -5650,7 +5650,7 @@ function getOctokitOptions(token, options) {
     return opts;
 }
 exports.getOctokitOptions = getOctokitOptions;
-
+//# sourceMappingURL=utils.js.map
 });
 
 var github = createCommonjsModule(function (module, exports) {
@@ -5688,7 +5688,7 @@ function getOctokit(token, options) {
     return new utils$1.GitHub(utils$1.getOctokitOptions(token, options));
 }
 exports.getOctokit = getOctokit;
-
+//# sourceMappingURL=github.js.map
 });
 
 /**
@@ -10500,12 +10500,22 @@ var Result;
     Result[Result["PRMergeSkipped"] = 9] = "PRMergeSkipped";
 })(Result || (Result = {}));
 
+var mergeMethods = ['merge', 'squash', 'rebase'];
+var isMergeMethod = function (method) {
+    return mergeMethods.includes(method);
+};
+var toMergeMethod = function (method) {
+    if (isMergeMethod(method)) {
+        return method;
+    }
+    throw new Error("merge-method invalid: " + method);
+};
 var semverRegex = /^([~^]?)[0-9]+\.[0-9]+\.[0-9]+(-.+)?$/;
 var retryDelays = [1, 1, 1, 2, 3, 4, 5, 10, 20, 40, 60].map(function (a) { return a * 1000; });
 var timeout = 6 * 60 * 60 * 1000;
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var startTime, context, payload, token, allowedActors, allowedUpdateTypes, approve, packageBlockList, merge, pr, Octokit, octokit, readPackageJson, mergeWhenPossible, getPR, compareCommits, approvePR, validVersionChange, comparison, onlyPackageJsonChanged, packageJsonBase, packageJsonPr, diff, allowedPropsChanges, allowedChange, result;
+        var startTime, context, payload, token, allowedActors, allowedUpdateTypes, approve, packageBlockList, merge, mergeMethod, pr, Octokit, octokit, readPackageJson, mergeWhenPossible, getPR, compareCommits, approvePR, validVersionChange, comparison, onlyPackageJsonChanged, packageJsonBase, packageJsonPr, diff, allowedPropsChanges, allowedChange, result;
         var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -10518,8 +10528,7 @@ function run() {
                         core.error("Unsupported event name: " + github.context.eventName);
                         return [2 /*return*/, Result.UnknownEvent];
                     }
-                    payload = github.context
-                        .payload;
+                    payload = github.context.payload;
                     token = core.getInput('repo-token', { required: true });
                     allowedActors = core.getInput('allowed-actors', { required: true })
                         .split(',')
@@ -10553,6 +10562,7 @@ function run() {
                         return [2 /*return*/, Result.ActorNotAllowed];
                     }
                     merge = core.getInput('merge') === 'true';
+                    mergeMethod = toMergeMethod(core.getInput('merge-method', { required: true }));
                     pr = payload.pull_request;
                     Octokit = utils$1.GitHub.plugin(throttling);
                     octokit = new Octokit(utils$1.getOctokitOptions(token, {
@@ -10615,6 +10625,7 @@ function run() {
                                                             owner: context.repo.owner,
                                                             repo: context.repo.repo,
                                                             pull_number: pr.number,
+                                                            merge_method: mergeMethod,
                                                             sha: pr.head.sha,
                                                         })];
                                                 case 3:
