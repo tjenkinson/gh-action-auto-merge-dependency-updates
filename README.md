@@ -16,8 +16,9 @@ It currently supports npm and yarn.
 - `approve` (optional): Automatically approve the PR if it qualifies for auto merge. _Default: `true`_
 - `package-block-list` (optional): A comma separated list of packages that auto merge should not be allowed for.
 - `merge` (optional): Merge the PR if it qualifies. _Default: `true`_
+- `merge-method` (optional): Merge method. Supported: `merge`, `squash`, `rebase` _Default: `merge`_
 
-You should configure this action to run on the `pull_request_target` event. If you use `pull_request` you must provide a custom `repo-token` which has permission to merge. [The default token for dependabot PRs only has read-only access](https://github.blog/changelog/2021-02-19-github-actions-workflows-triggered-by-dependabot-prs-will-run-with-read-only-permissions/).
+You should configure this action to run on the `pull_request_target` event. If you use `pull_request` you might need to provide a custom `repo-token` which has permission to merge. [The default token for dependabot PRs only has read-only access](https://github.blog/changelog/2021-02-19-github-actions-workflows-triggered-by-dependabot-prs-will-run-with-read-only-permissions/).
 
 ## Outputs
 

@@ -17,6 +17,9 @@ inputs:
   merge:
     description: 'Merge the PR if it qualifies'
     default: 'true'
+  merge-method:
+    description: 'Merge method to use. Supported: "merge", "squash", "rebase"'
+    default: 'merge'
   package-block-list:
     required: false
     description: 'Comma separated list of packages that auto merge should not be allowed for'

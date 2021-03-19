@@ -7,6 +7,19 @@ import { detailedDiff } from 'deep-object-diff';
 import semver from 'semver';
 import { Result } from './result';
 
+type MergeMethod = 'merge' | 'squash' | 'rebase';
+const mergeMethods: ReadonlyArray<MergeMethod> = ['merge', 'squash', 'rebase'];
+const isMergeMethod = (method: string): method is MergeMethod => {
+  return mergeMethods.includes(method as MergeMethod);
+};
+const toMergeMethod = (method: string): MergeMethod => {
+  if (isMergeMethod(method)) {
+    return method;
+  }
+  throw new Error(`merge-method invalid: ${method}`);
+};
+
+
 const semverRegex = /^([~^]?)[0-9]+\.[0-9]+\.[0-9]+(-.+)?$/;
 const retryDelays = [1, 1, 1, 2, 3, 4, 5, 10, 20, 40, 60].map((a) => a * 1000);
 const timeout = 6 * 60 * 60 * 1000;
@@ -71,6 +84,9 @@ export async function run(): Promise<Result> {
   }
 
   const merge = core.getInput('merge') === 'true';
+  const mergeMethod = toMergeMethod(
+    core.getInput('merge-method', { required: true })
+  );
 
   const pr = payload.pull_request;
 
@@ -124,6 +140,7 @@ export async function run(): Promise<Result> {
             owner: context.repo.owner,
             repo: context.repo.repo,
             pull_number: pr.number,
+            merge_method: mergeMethod,
             sha: pr.head.sha,
           });
           core.info('Merged');

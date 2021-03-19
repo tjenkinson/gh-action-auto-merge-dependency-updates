@@ -160,6 +160,7 @@ describe('run', () => {
         let mockAllowedUpdateTypes: string;
         let mockApprove: string;
         let mockMerge: string;
+        let mockMergeMethod: string;
         let mockPackageBlockList: string;
 
         beforeEach(() => {
@@ -168,6 +169,7 @@ describe('run', () => {
           mockAllowedUpdateTypes = '';
           mockApprove = '';
           mockMerge = '';
+          mockMergeMethod = 'merge';
           mockPackageBlockList = '';
 
           (core.setOutput as any).mockReset();
@@ -192,6 +194,9 @@ describe('run', () => {
             .calledWith('package-block-list')
             .mockImplementation(() => mockPackageBlockList);
           getInputMock.calledWith('merge').mockImplementation(() => mockMerge);
+          getInputMock
+            .calledWith('merge-method', { required: true })
+            .mockImplementation(() => mockMergeMethod);
         });
 
         it('stops if the actor is not in the allow list', async () => {
@@ -339,6 +344,7 @@ describe('run', () => {
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
                 pull_number: github.context.payload.pull_request!.number,
+                merge_method: mockMergeMethod,
                 sha: mockSha,
               })
               .mockImplementation(validMergeCallMock);
@@ -381,6 +387,14 @@ describe('run', () => {
             await expect(run()).rejects.toHaveProperty(
               'message',
               'allowed-update-types invalid'
+            );
+          });
+
+          it('errors if merge-method invalid', async () => {
+            mockMergeMethod = 'invalid';
+            await expect(run()).rejects.toHaveProperty(
+              'message',
+              'merge-method invalid: invalid'
             );
           });
 
