@@ -6,8 +6,8 @@ on:
 
 jobs:
   actions-tagger:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
-      - uses: Actions-R-Us/actions-tagger@c46540b9f3302c3b4e6a7bd622cb478fc98c52be
+      - uses: Actions-R-Us/actions-tagger@95c51c646e75db5c6b7d447e3087bcee58677341
         env:
           GITHUB_TOKEN: '${{ github.token }}'
