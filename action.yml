@@ -23,6 +23,9 @@ inputs:
   package-block-list:
     required: false
     description: 'Comma separated list of packages that auto merge should not be allowed for'
+  package-allow-list:
+    required: false
+    description: 'Comma separated list of packages that auto merge should only be allowed for. Omit to allow all packages'
 outputs:
   success:
     description: '"true" if the commit meets the criteria'

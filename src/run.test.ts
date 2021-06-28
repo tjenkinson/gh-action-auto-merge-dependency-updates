@@ -162,6 +162,7 @@ describe('run', () => {
         let mockMerge: string;
         let mockMergeMethod: string;
         let mockPackageBlockList: string;
+        let mockPackageAllowList: string | undefined;
 
         beforeEach(() => {
           github.context.eventName = name;
@@ -171,6 +172,7 @@ describe('run', () => {
           mockMerge = '';
           mockMergeMethod = 'merge';
           mockPackageBlockList = '';
+          mockPackageAllowList = undefined;
 
           (core.setOutput as any).mockReset();
           const getInputMock = when(core.getInput as any).mockImplementation(
@@ -193,6 +195,9 @@ describe('run', () => {
           getInputMock
             .calledWith('package-block-list')
             .mockImplementation(() => mockPackageBlockList);
+          getInputMock
+            .calledWith('package-allow-list')
+            .mockImplementation(() => mockPackageAllowList);
           getInputMock.calledWith('merge').mockImplementation(() => mockMerge);
           getInputMock
             .calledWith('merge-method', { required: true })
@@ -473,6 +478,29 @@ describe('run', () => {
             mockPackageJsonPr.dependencies = {
               dep1: '1.2.4',
               dep2: '1.2.4',
+            };
+            expect(await run()).toBe(Result.VersionChangeNotAllowed);
+
+            mockPackageJsonBase.dependencies = {
+              dep1: '1.2.3',
+              something: '1.2.3',
+            };
+            mockPackageJsonPr.dependencies = {
+              dep1: '1.2.4',
+              something: '1.2.4',
+            };
+            expect(await run()).toBe(Result.VersionChangeNotAllowed);
+          });
+
+          it('stops if one of the updates is not in the package allow list', async () => {
+            mockAllowedUpdateTypes = 'dependencies: patch';
+            mockPackageAllowList = 'dep1, dep2';
+
+            mockPackageJsonBase.dependencies = {
+              something: '1.2.3',
+            };
+            mockPackageJsonPr.dependencies = {
+              something: '1.2.4',
             };
             expect(await run()).toBe(Result.VersionChangeNotAllowed);
 

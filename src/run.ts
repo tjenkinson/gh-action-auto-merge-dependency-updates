@@ -77,6 +77,11 @@ export async function run(): Promise<Result> {
     .split(',')
     .map((a) => a.trim());
 
+  const packageAllowListRaw = core.getInput('package-allow-list');
+  const packageAllowList = packageAllowListRaw
+    ? packageAllowListRaw.split(',').map((a) => a.trim())
+    : null;
+
   if (!allowedActors.includes(context.actor)) {
     core.error(`Actor not allowed: ${context.actor}`);
     return Result.ActorNotAllowed;
@@ -280,6 +285,9 @@ export async function run(): Promise<Result> {
     const changedDependencies = diff.updated[prop];
     return Object.keys(changedDependencies).every((dependency) => {
       if (typeof changedDependencies[dependency] !== 'string') {
+        return false;
+      }
+      if (packageAllowList && !packageAllowList.includes(dependency)) {
         return false;
       }
       if (packageBlockList.includes(dependency)) {
