@@ -15,6 +15,7 @@ It currently supports npm and yarn.
 - `allowed-update-types` (optional): A comma separated list of types of updates that are allowed. Supported: [devDependencies|dependencies]:[major|minor|patch]. _Default: `devDependencies:minor, devDependencies:patch`_
 - `approve` (optional): Automatically approve the PR if it qualifies for auto merge. _Default: `true`_
 - `package-block-list` (optional): A comma separated list of packages that auto merge should not be allowed for.
+- `package-allow-list` (optional): A comma separated list of packages that auto merge should only be allowed for. Omit to allow all packages.
 - `merge` (optional): Merge the PR if it qualifies. _Default: `true`_
 - `merge-method` (optional): Merge method. Supported: `merge`, `squash`, `rebase` _Default: `merge`_
 
