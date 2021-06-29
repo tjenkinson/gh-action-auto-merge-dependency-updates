@@ -1,30 +1,30 @@
 'use strict';
 
-var require$$0 = require('os');
-var fs_1 = require('fs');
-var require$$1 = require('path');
-var url = require('url');
-var http = require('http');
-var https = require('https');
+var require$$1 = require('os');
+var require$$0 = require('fs');
+var require$$4$1 = require('path');
+var Url = require('url');
+var http$1 = require('http');
+var require$$3$1 = require('https');
 require('net');
-var tls = require('tls');
-var events = require('events');
+var require$$1$1 = require('tls');
+var require$$4$2 = require('events');
 require('assert');
-var util = require('util');
+var require$$6 = require('util');
 var Stream = require('stream');
 var zlib = require('zlib');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
-var require$$0__default = /*#__PURE__*/_interopDefaultLegacy(require$$0);
-var fs_1__default = /*#__PURE__*/_interopDefaultLegacy(fs_1);
 var require$$1__default = /*#__PURE__*/_interopDefaultLegacy(require$$1);
-var url__default = /*#__PURE__*/_interopDefaultLegacy(url);
-var http__default = /*#__PURE__*/_interopDefaultLegacy(http);
-var https__default = /*#__PURE__*/_interopDefaultLegacy(https);
-var tls__default = /*#__PURE__*/_interopDefaultLegacy(tls);
-var events__default = /*#__PURE__*/_interopDefaultLegacy(events);
-var util__default = /*#__PURE__*/_interopDefaultLegacy(util);
+var require$$0__default = /*#__PURE__*/_interopDefaultLegacy(require$$0);
+var require$$4__default = /*#__PURE__*/_interopDefaultLegacy(require$$4$1);
+var Url__default = /*#__PURE__*/_interopDefaultLegacy(Url);
+var http__default = /*#__PURE__*/_interopDefaultLegacy(http$1);
+var require$$3__default = /*#__PURE__*/_interopDefaultLegacy(require$$3$1);
+var require$$1__default$1 = /*#__PURE__*/_interopDefaultLegacy(require$$1$1);
+var require$$4__default$1 = /*#__PURE__*/_interopDefaultLegacy(require$$4$2);
+var require$$6__default = /*#__PURE__*/_interopDefaultLegacy(require$$6);
 var Stream__default = /*#__PURE__*/_interopDefaultLegacy(Stream);
 var zlib__default = /*#__PURE__*/_interopDefaultLegacy(zlib);
 
@@ -45,14 +45,16 @@ function getAugmentedNamespace(n) {
 	return a;
 }
 
-function createCommonjsModule(fn) {
-  var module = { exports: {} };
-	return fn(module, module.exports), module.exports;
-}
+var core = {};
+
+var command = {};
+
+var utils$3 = {};
 
 // We use any as a valid input type
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
+Object.defineProperty(utils$3, "__esModule", { value: true });
+utils$3.toCommandValue = void 0;
 /**
  * Sanitizes an input into a string so it can be passed into issueCommand safely
  * @param input input to sanitize into a string
@@ -66,23 +68,31 @@ function toCommandValue(input) {
     }
     return JSON.stringify(input);
 }
-var toCommandValue_1 = toCommandValue;
+utils$3.toCommandValue = toCommandValue;
 
-
-var utils$3 = /*#__PURE__*/Object.defineProperty({
-	toCommandValue: toCommandValue_1
-}, '__esModule', {value: true});
-
-var __importStar$1 = (commonjsGlobal && commonjsGlobal.__importStar) || function (mod) {
+var __createBinding$4 = (commonjsGlobal && commonjsGlobal.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault$4 = (commonjsGlobal && commonjsGlobal.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar$4 = (commonjsGlobal && commonjsGlobal.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding$4(result, mod, k);
+    __setModuleDefault$4(result, mod);
     return result;
 };
-
-const os$1 = __importStar$1(require$$0__default['default']);
-
+Object.defineProperty(command, "__esModule", { value: true });
+command.issue = command.issueCommand = void 0;
+const os$1 = __importStar$4(require$$1__default['default']);
+const utils_1$2 = utils$3;
 /**
  * Commands
  *
@@ -97,11 +107,11 @@ function issueCommand$1(command, properties, message) {
     const cmd = new Command(command, properties, message);
     process.stdout.write(cmd.toString() + os$1.EOL);
 }
-var issueCommand_1$1 = issueCommand$1;
+command.issueCommand = issueCommand$1;
 function issue(name, message = '') {
     issueCommand$1(name, {}, message);
 }
-var issue_1 = issue;
+command.issue = issue;
 const CMD_STRING = '::';
 class Command {
     constructor(command, properties, message) {
@@ -137,13 +147,13 @@ class Command {
     }
 }
 function escapeData(s) {
-    return utils$3.toCommandValue(s)
+    return utils_1$2.toCommandValue(s)
         .replace(/%/g, '%25')
         .replace(/\r/g, '%0D')
         .replace(/\n/g, '%0A');
 }
 function escapeProperty(s) {
-    return utils$3.toCommandValue(s)
+    return utils_1$2.toCommandValue(s)
         .replace(/%/g, '%25')
         .replace(/\r/g, '%0D')
         .replace(/\n/g, '%0A')
@@ -151,26 +161,35 @@ function escapeProperty(s) {
         .replace(/,/g, '%2C');
 }
 
-
-var command = /*#__PURE__*/Object.defineProperty({
-	issueCommand: issueCommand_1$1,
-	issue: issue_1
-}, '__esModule', {value: true});
+var fileCommand = {};
 
 // For internal use, subject to change.
-var __importStar = (commonjsGlobal && commonjsGlobal.__importStar) || function (mod) {
+var __createBinding$3 = (commonjsGlobal && commonjsGlobal.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault$3 = (commonjsGlobal && commonjsGlobal.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar$3 = (commonjsGlobal && commonjsGlobal.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding$3(result, mod, k);
+    __setModuleDefault$3(result, mod);
     return result;
 };
-
+Object.defineProperty(fileCommand, "__esModule", { value: true });
+fileCommand.issueCommand = void 0;
 // We use any as a valid input type
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const fs = __importStar(fs_1__default['default']);
-const os = __importStar(require$$0__default['default']);
-
+const fs = __importStar$3(require$$0__default['default']);
+const os = __importStar$3(require$$1__default['default']);
+const utils_1$1 = utils$3;
 function issueCommand(command, message) {
     const filePath = process.env[`GITHUB_${command}`];
     if (!filePath) {
@@ -179,18 +198,32 @@ function issueCommand(command, message) {
     if (!fs.existsSync(filePath)) {
         throw new Error(`Missing file at path: ${filePath}`);
     }
-    fs.appendFileSync(filePath, `${utils$3.toCommandValue(message)}${os.EOL}`, {
+    fs.appendFileSync(filePath, `${utils_1$1.toCommandValue(message)}${os.EOL}`, {
         encoding: 'utf8'
     });
 }
-var issueCommand_1 = issueCommand;
+fileCommand.issueCommand = issueCommand;
 
-
-var fileCommand = /*#__PURE__*/Object.defineProperty({
-	issueCommand: issueCommand_1
-}, '__esModule', {value: true});
-
-var core = createCommonjsModule(function (module, exports) {
+(function (exports) {
+var __createBinding = (commonjsGlobal && commonjsGlobal.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (commonjsGlobal && commonjsGlobal.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (commonjsGlobal && commonjsGlobal.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (commonjsGlobal && commonjsGlobal.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -200,19 +233,13 @@ var __awaiter = (commonjsGlobal && commonjsGlobal.__awaiter) || function (thisAr
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importStar = (commonjsGlobal && commonjsGlobal.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-
-
-
-const os = __importStar(require$$0__default['default']);
-const path = __importStar(require$$1__default['default']);
+exports.getState = exports.saveState = exports.group = exports.endGroup = exports.startGroup = exports.info = exports.warning = exports.error = exports.debug = exports.isDebug = exports.setFailed = exports.setCommandEcho = exports.setOutput = exports.getBooleanInput = exports.getMultilineInput = exports.getInput = exports.addPath = exports.setSecret = exports.exportVariable = exports.ExitCode = void 0;
+const command_1 = command;
+const file_command_1 = fileCommand;
+const utils_1 = utils$3;
+const os = __importStar(require$$1__default['default']);
+const path = __importStar(require$$4__default['default']);
 /**
  * The code to exit an action
  */
@@ -237,16 +264,16 @@ var ExitCode;
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function exportVariable(name, val) {
-    const convertedVal = utils$3.toCommandValue(val);
+    const convertedVal = utils_1.toCommandValue(val);
     process.env[name] = convertedVal;
     const filePath = process.env['GITHUB_ENV'] || '';
     if (filePath) {
         const delimiter = '_GitHubActionsFileCommandDelimeter_';
         const commandValue = `${name}<<${delimiter}${os.EOL}${convertedVal}${os.EOL}${delimiter}`;
-        fileCommand.issueCommand('ENV', commandValue);
+        file_command_1.issueCommand('ENV', commandValue);
     }
     else {
-        command.issueCommand('set-env', { name }, convertedVal);
+        command_1.issueCommand('set-env', { name }, convertedVal);
     }
 }
 exports.exportVariable = exportVariable;
@@ -255,7 +282,7 @@ exports.exportVariable = exportVariable;
  * @param secret value of the secret
  */
 function setSecret(secret) {
-    command.issueCommand('add-mask', {}, secret);
+    command_1.issueCommand('add-mask', {}, secret);
 }
 exports.setSecret = setSecret;
 /**
@@ -265,16 +292,18 @@ exports.setSecret = setSecret;
 function addPath(inputPath) {
     const filePath = process.env['GITHUB_PATH'] || '';
     if (filePath) {
-        fileCommand.issueCommand('PATH', inputPath);
+        file_command_1.issueCommand('PATH', inputPath);
     }
     else {
-        command.issueCommand('add-path', {}, inputPath);
+        command_1.issueCommand('add-path', {}, inputPath);
     }
     process.env['PATH'] = `${inputPath}${path.delimiter}${process.env['PATH']}`;
 }
 exports.addPath = addPath;
 /**
- * Gets the value of an input.  The value is also trimmed.
+ * Gets the value of an input.
+ * Unless trimWhitespace is set to false in InputOptions, the value is also trimmed.
+ * Returns an empty string if the value is not defined.
  *
  * @param     name     name of the input to get
  * @param     options  optional. See InputOptions.
@@ -285,9 +314,49 @@ function getInput(name, options) {
     if (options && options.required && !val) {
         throw new Error(`Input required and not supplied: ${name}`);
     }
+    if (options && options.trimWhitespace === false) {
+        return val;
+    }
     return val.trim();
 }
 exports.getInput = getInput;
+/**
+ * Gets the values of an multiline input.  Each value is also trimmed.
+ *
+ * @param     name     name of the input to get
+ * @param     options  optional. See InputOptions.
+ * @returns   string[]
+ *
+ */
+function getMultilineInput(name, options) {
+    const inputs = getInput(name, options)
+        .split('\n')
+        .filter(x => x !== '');
+    return inputs;
+}
+exports.getMultilineInput = getMultilineInput;
+/**
+ * Gets the input value of the boolean type in the YAML 1.2 "core schema" specification.
+ * Support boolean input list: `true | True | TRUE | false | False | FALSE` .
+ * The return value is also in boolean type.
+ * ref: https://yaml.org/spec/1.2/spec.html#id2804923
+ *
+ * @param     name     name of the input to get
+ * @param     options  optional. See InputOptions.
+ * @returns   boolean
+ */
+function getBooleanInput(name, options) {
+    const trueValue = ['true', 'True', 'TRUE'];
+    const falseValue = ['false', 'False', 'FALSE'];
+    const val = getInput(name, options);
+    if (trueValue.includes(val))
+        return true;
+    if (falseValue.includes(val))
+        return false;
+    throw new TypeError(`Input does not meet YAML 1.2 "Core Schema" specification: ${name}\n` +
+        `Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
+}
+exports.getBooleanInput = getBooleanInput;
 /**
  * Sets the value of an output.
  *
@@ -296,7 +365,8 @@ exports.getInput = getInput;
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function setOutput(name, value) {
-    command.issueCommand('set-output', { name }, value);
+    process.stdout.write(os.EOL);
+    command_1.issueCommand('set-output', { name }, value);
 }
 exports.setOutput = setOutput;
 /**
@@ -305,7 +375,7 @@ exports.setOutput = setOutput;
  *
  */
 function setCommandEcho(enabled) {
-    command.issue('echo', enabled ? 'on' : 'off');
+    command_1.issue('echo', enabled ? 'on' : 'off');
 }
 exports.setCommandEcho = setCommandEcho;
 //-----------------------------------------------------------------------
@@ -336,7 +406,7 @@ exports.isDebug = isDebug;
  * @param message debug message
  */
 function debug(message) {
-    command.issueCommand('debug', {}, message);
+    command_1.issueCommand('debug', {}, message);
 }
 exports.debug = debug;
 /**
@@ -344,7 +414,7 @@ exports.debug = debug;
  * @param message error issue message. Errors will be converted to string via toString()
  */
 function error(message) {
-    command.issue('error', message instanceof Error ? message.toString() : message);
+    command_1.issue('error', message instanceof Error ? message.toString() : message);
 }
 exports.error = error;
 /**
@@ -352,7 +422,7 @@ exports.error = error;
  * @param message warning issue message. Errors will be converted to string via toString()
  */
 function warning(message) {
-    command.issue('warning', message instanceof Error ? message.toString() : message);
+    command_1.issue('warning', message instanceof Error ? message.toString() : message);
 }
 exports.warning = warning;
 /**
@@ -371,14 +441,14 @@ exports.info = info;
  * @param name The name of the output group
  */
 function startGroup(name) {
-    command.issue('group', name);
+    command_1.issue('group', name);
 }
 exports.startGroup = startGroup;
 /**
  * End an output group.
  */
 function endGroup() {
-    command.issue('endgroup');
+    command_1.issue('endgroup');
 }
 exports.endGroup = endGroup;
 /**
@@ -414,7 +484,7 @@ exports.group = group;
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function saveState(name, value) {
-    command.issueCommand('save-state', { name }, value);
+    command_1.issueCommand('save-state', { name }, value);
 }
 exports.saveState = saveState;
 /**
@@ -427,8 +497,8 @@ function getState(name) {
     return process.env[`STATE_${name}`] || '';
 }
 exports.getState = getState;
-//# sourceMappingURL=core.js.map
-});
+
+}(core));
 
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation.
@@ -483,24 +553,27 @@ function __generator(thisArg, body) {
     }
 }
 
-var context = createCommonjsModule(function (module, exports) {
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Context = void 0;
+var github = {};
 
+var context$1 = {};
 
-class Context {
+Object.defineProperty(context$1, "__esModule", { value: true });
+context$1.Context = void 0;
+const fs_1 = require$$0__default['default'];
+const os_1 = require$$1__default['default'];
+class Context$2 {
     /**
      * Hydrate the context from the environment
      */
     constructor() {
         this.payload = {};
         if (process.env.GITHUB_EVENT_PATH) {
-            if (fs_1__default['default'].existsSync(process.env.GITHUB_EVENT_PATH)) {
-                this.payload = JSON.parse(fs_1__default['default'].readFileSync(process.env.GITHUB_EVENT_PATH, { encoding: 'utf8' }));
+            if (fs_1.existsSync(process.env.GITHUB_EVENT_PATH)) {
+                this.payload = JSON.parse(fs_1.readFileSync(process.env.GITHUB_EVENT_PATH, { encoding: 'utf8' }));
             }
             else {
                 const path = process.env.GITHUB_EVENT_PATH;
-                process.stdout.write(`GITHUB_EVENT_PATH ${path} does not exist${require$$0__default['default'].EOL}`);
+                process.stdout.write(`GITHUB_EVENT_PATH ${path} does not exist${os_1.EOL}`);
             }
         }
         this.eventName = process.env.GITHUB_EVENT_NAME;
@@ -531,10 +604,18 @@ class Context {
         throw new Error("context.repo requires a GITHUB_REPOSITORY environment variable like 'owner/repo'");
     }
 }
-exports.Context = Context;
-//# sourceMappingURL=context.js.map
-});
+context$1.Context = Context$2;
 
+var utils$2 = {};
+
+var utils$1 = {};
+
+var httpClient$1 = {};
+
+var proxy = {};
+
+Object.defineProperty(proxy, "__esModule", { value: true });
+const url = Url__default['default'];
 function getProxyUrl(reqUrl) {
     let usingSsl = reqUrl.protocol === 'https:';
     let proxyUrl;
@@ -549,11 +630,11 @@ function getProxyUrl(reqUrl) {
         proxyVar = process.env['http_proxy'] || process.env['HTTP_PROXY'];
     }
     if (proxyVar) {
-        proxyUrl = url__default['default'].parse(proxyVar);
+        proxyUrl = url.parse(proxyVar);
     }
     return proxyUrl;
 }
-var getProxyUrl_1 = getProxyUrl;
+proxy.getProxyUrl = getProxyUrl;
 function checkBypass(reqUrl) {
     if (!reqUrl.hostname) {
         return false;
@@ -589,28 +670,32 @@ function checkBypass(reqUrl) {
     }
     return false;
 }
-var checkBypass_1 = checkBypass;
+proxy.checkBypass = checkBypass;
 
-var proxy = /*#__PURE__*/Object.defineProperty({
-	getProxyUrl: getProxyUrl_1,
-	checkBypass: checkBypass_1
-}, '__esModule', {value: true});
+var tunnel$1 = {};
 
-var httpOverHttp_1 = httpOverHttp;
-var httpsOverHttp_1 = httpsOverHttp;
-var httpOverHttps_1 = httpOverHttps;
-var httpsOverHttps_1 = httpsOverHttps;
+var tls = require$$1__default$1['default'];
+var http = http__default['default'];
+var https = require$$3__default['default'];
+var events = require$$4__default$1['default'];
+var util = require$$6__default['default'];
+
+
+tunnel$1.httpOverHttp = httpOverHttp;
+tunnel$1.httpsOverHttp = httpsOverHttp;
+tunnel$1.httpOverHttps = httpOverHttps;
+tunnel$1.httpsOverHttps = httpsOverHttps;
 
 
 function httpOverHttp(options) {
   var agent = new TunnelingAgent(options);
-  agent.request = http__default['default'].request;
+  agent.request = http.request;
   return agent;
 }
 
 function httpsOverHttp(options) {
   var agent = new TunnelingAgent(options);
-  agent.request = http__default['default'].request;
+  agent.request = http.request;
   agent.createSocket = createSecureSocket;
   agent.defaultPort = 443;
   return agent;
@@ -618,13 +703,13 @@ function httpsOverHttp(options) {
 
 function httpOverHttps(options) {
   var agent = new TunnelingAgent(options);
-  agent.request = https__default['default'].request;
+  agent.request = https.request;
   return agent;
 }
 
 function httpsOverHttps(options) {
   var agent = new TunnelingAgent(options);
-  agent.request = https__default['default'].request;
+  agent.request = https.request;
   agent.createSocket = createSecureSocket;
   agent.defaultPort = 443;
   return agent;
@@ -635,7 +720,7 @@ function TunnelingAgent(options) {
   var self = this;
   self.options = options || {};
   self.proxyOptions = self.options.proxy || {};
-  self.maxSockets = self.options.maxSockets || http__default['default'].Agent.defaultMaxSockets;
+  self.maxSockets = self.options.maxSockets || http.Agent.defaultMaxSockets;
   self.requests = [];
   self.sockets = [];
 
@@ -655,7 +740,7 @@ function TunnelingAgent(options) {
     self.removeSocket(socket);
   });
 }
-util__default['default'].inherits(TunnelingAgent, events__default['default'].EventEmitter);
+util.inherits(TunnelingAgent, events.EventEmitter);
 
 TunnelingAgent.prototype.addRequest = function addRequest(req, host, port, localAddress) {
   var self = this;
@@ -709,7 +794,7 @@ TunnelingAgent.prototype.createSocket = function createSocket(options, cb) {
         new Buffer(connectOptions.proxyAuth).toString('base64');
   }
 
-  debug$1('making CONNECT request');
+  debug$4('making CONNECT request');
   var connectReq = self.request(connectOptions);
   connectReq.useChunkedEncodingByDefault = false; // for v0.6
   connectReq.once('response', onResponse); // for v0.6
@@ -735,7 +820,7 @@ TunnelingAgent.prototype.createSocket = function createSocket(options, cb) {
     socket.removeAllListeners();
 
     if (res.statusCode !== 200) {
-      debug$1('tunneling socket could not be established, statusCode=%d',
+      debug$4('tunneling socket could not be established, statusCode=%d',
         res.statusCode);
       socket.destroy();
       var error = new Error('tunneling socket could not be established, ' +
@@ -746,7 +831,7 @@ TunnelingAgent.prototype.createSocket = function createSocket(options, cb) {
       return;
     }
     if (head.length > 0) {
-      debug$1('got illegal response body from proxy');
+      debug$4('got illegal response body from proxy');
       socket.destroy();
       var error = new Error('got illegal response body from proxy');
       error.code = 'ECONNRESET';
@@ -754,7 +839,7 @@ TunnelingAgent.prototype.createSocket = function createSocket(options, cb) {
       self.removeSocket(placeholder);
       return;
     }
-    debug$1('tunneling connection has established');
+    debug$4('tunneling connection has established');
     self.sockets[self.sockets.indexOf(placeholder)] = socket;
     return cb(socket);
   }
@@ -762,7 +847,7 @@ TunnelingAgent.prototype.createSocket = function createSocket(options, cb) {
   function onError(cause) {
     connectReq.removeAllListeners();
 
-    debug$1('tunneling socket could not be established, cause=%s\n',
+    debug$4('tunneling socket could not be established, cause=%s\n',
           cause.message, cause.stack);
     var error = new Error('tunneling socket could not be established, ' +
                           'cause=' + cause.message);
@@ -799,7 +884,7 @@ function createSecureSocket(options, cb) {
     });
 
     // 0 is dummy port for v0.6
-    var secureSocket = tls__default['default'].connect(0, tlsOptions);
+    var secureSocket = tls.connect(0, tlsOptions);
     self.sockets[self.sockets.indexOf(socket)] = secureSocket;
     cb(secureSocket);
   });
@@ -834,9 +919,9 @@ function mergeOptions(target) {
 }
 
 
-var debug$1;
+var debug$4;
 if (process.env.NODE_DEBUG && /\btunnel\b/.test(process.env.NODE_DEBUG)) {
-  debug$1 = function() {
+  debug$4 = function() {
     var args = Array.prototype.slice.call(arguments);
     if (typeof args[0] === 'string') {
       args[0] = 'TUNNEL: ' + args[0];
@@ -846,26 +931,18 @@ if (process.env.NODE_DEBUG && /\btunnel\b/.test(process.env.NODE_DEBUG)) {
     console.error.apply(console, args);
   };
 } else {
-  debug$1 = function() {};
+  debug$4 = function() {};
 }
-var debug_1$1 = debug$1; // for test
-
-var tunnel$1 = {
-	httpOverHttp: httpOverHttp_1,
-	httpsOverHttp: httpsOverHttp_1,
-	httpOverHttps: httpOverHttps_1,
-	httpsOverHttps: httpsOverHttps_1,
-	debug: debug_1$1
-};
+tunnel$1.debug = debug$4; // for test
 
 var tunnel = tunnel$1;
 
-var httpClient = createCommonjsModule(function (module, exports) {
+(function (exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
-
-
-
-
+const url = Url__default['default'];
+const http = http__default['default'];
+const https = require$$3__default['default'];
+const pm = proxy;
 let tunnel$1;
 var HttpCodes;
 (function (HttpCodes) {
@@ -911,7 +988,7 @@ var MediaTypes;
  * @param serverUrl  The server URL where the request will be sent. For example, https://api.github.com
  */
 function getProxyUrl(serverUrl) {
-    let proxyUrl = proxy.getProxyUrl(url__default['default'].parse(serverUrl));
+    let proxyUrl = pm.getProxyUrl(url.parse(serverUrl));
     return proxyUrl ? proxyUrl.href : '';
 }
 exports.getProxyUrl = getProxyUrl;
@@ -948,7 +1025,7 @@ class HttpClientResponse {
 }
 exports.HttpClientResponse = HttpClientResponse;
 function isHttps(requestUrl) {
-    let parsedUrl = url__default['default'].parse(requestUrl);
+    let parsedUrl = url.parse(requestUrl);
     return parsedUrl.protocol === 'https:';
 }
 exports.isHttps = isHttps;
@@ -1053,7 +1130,7 @@ class HttpClient {
         if (this._disposed) {
             throw new Error('Client has already been disposed.');
         }
-        let parsedUrl = url__default['default'].parse(requestUrl);
+        let parsedUrl = url.parse(requestUrl);
         let info = this._prepareRequest(verb, parsedUrl, headers);
         // Only perform retries on reads since writes may not be idempotent.
         let maxTries = this._allowRetries && RetryableHttpVerbs.indexOf(verb) != -1
@@ -1092,7 +1169,7 @@ class HttpClient {
                     // if there's no location to redirect to, we won't
                     break;
                 }
-                let parsedRedirectUrl = url__default['default'].parse(redirectUrl);
+                let parsedRedirectUrl = url.parse(redirectUrl);
                 if (parsedUrl.protocol == 'https:' &&
                     parsedUrl.protocol != parsedRedirectUrl.protocol &&
                     !this._allowRedirectDowngrade) {
@@ -1208,14 +1285,14 @@ class HttpClient {
      * @param serverUrl  The server URL where the request will be sent. For example, https://api.github.com
      */
     getAgent(serverUrl) {
-        let parsedUrl = url__default['default'].parse(serverUrl);
+        let parsedUrl = url.parse(serverUrl);
         return this._getAgent(parsedUrl);
     }
     _prepareRequest(method, requestUrl, headers) {
         const info = {};
         info.parsedUrl = requestUrl;
         const usingSsl = info.parsedUrl.protocol === 'https:';
-        info.httpModule = usingSsl ? https__default['default'] : http__default['default'];
+        info.httpModule = usingSsl ? https : http;
         const defaultPort = usingSsl ? 443 : 80;
         info.options = {};
         info.options.host = info.parsedUrl.hostname;
@@ -1255,7 +1332,7 @@ class HttpClient {
     }
     _getAgent(parsedUrl) {
         let agent;
-        let proxyUrl = proxy.getProxyUrl(parsedUrl);
+        let proxyUrl = pm.getProxyUrl(parsedUrl);
         let useProxy = proxyUrl && proxyUrl.hostname;
         if (this._keepAlive && useProxy) {
             agent = this._proxyAgent;
@@ -1270,7 +1347,7 @@ class HttpClient {
         const usingSsl = parsedUrl.protocol === 'https:';
         let maxSockets = 100;
         if (!!this.requestOptions) {
-            maxSockets = this.requestOptions.maxSockets || http__default['default'].globalAgent.maxSockets;
+            maxSockets = this.requestOptions.maxSockets || http.globalAgent.maxSockets;
         }
         if (useProxy) {
             // If using proxy, need tunnel
@@ -1300,12 +1377,12 @@ class HttpClient {
         // if reusing agent across request and tunneling agent isn't assigned create a new agent
         if (this._keepAlive && !agent) {
             const options = { keepAlive: this._keepAlive, maxSockets: maxSockets };
-            agent = usingSsl ? new https__default['default'].Agent(options) : new http__default['default'].Agent(options);
+            agent = usingSsl ? new https.Agent(options) : new http.Agent(options);
             this._agent = agent;
         }
         // if not using private agent and tunnel agent isn't setup then use global agent
         if (!agent) {
-            agent = usingSsl ? https__default['default'].globalAgent : http__default['default'].globalAgent;
+            agent = usingSsl ? https.globalAgent : http.globalAgent;
         }
         if (usingSsl && this._ignoreSslError) {
             // we don't want to set NODE_TLS_REJECT_UNAUTHORIZED=0 since that will affect request for entire process
@@ -1391,31 +1468,30 @@ class HttpClient {
     }
 }
 exports.HttpClient = HttpClient;
-});
+}(httpClient$1));
 
-var utils$2 = createCommonjsModule(function (module, exports) {
-var __createBinding = (commonjsGlobal && commonjsGlobal.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+var __createBinding$2 = (commonjsGlobal && commonjsGlobal.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
 }));
-var __setModuleDefault = (commonjsGlobal && commonjsGlobal.__setModuleDefault) || (Object.create ? (function(o, v) {
+var __setModuleDefault$2 = (commonjsGlobal && commonjsGlobal.__setModuleDefault) || (Object.create ? (function(o, v) {
     Object.defineProperty(o, "default", { enumerable: true, value: v });
 }) : function(o, v) {
     o["default"] = v;
 });
-var __importStar = (commonjsGlobal && commonjsGlobal.__importStar) || function (mod) {
+var __importStar$2 = (commonjsGlobal && commonjsGlobal.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) __createBinding$2(result, mod, k);
+    __setModuleDefault$2(result, mod);
     return result;
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getApiBaseUrl = exports.getProxyAgent = exports.getAuthString = void 0;
-const httpClient$1 = __importStar(httpClient);
+Object.defineProperty(utils$1, "__esModule", { value: true });
+utils$1.getApiBaseUrl = utils$1.getProxyAgent = utils$1.getAuthString = void 0;
+const httpClient = __importStar$2(httpClient$1);
 function getAuthString(token, options) {
     if (!token && !options.auth) {
         throw new Error('Parameter token or opts.auth is required');
@@ -1425,18 +1501,16 @@ function getAuthString(token, options) {
     }
     return typeof options.auth === 'string' ? options.auth : `token ${token}`;
 }
-exports.getAuthString = getAuthString;
+utils$1.getAuthString = getAuthString;
 function getProxyAgent(destinationUrl) {
-    const hc = new httpClient$1.HttpClient();
+    const hc = new httpClient.HttpClient();
     return hc.getAgent(destinationUrl);
 }
-exports.getProxyAgent = getProxyAgent;
+utils$1.getProxyAgent = getProxyAgent;
 function getApiBaseUrl() {
     return process.env['GITHUB_API_URL'] || 'https://api.github.com';
 }
-exports.getApiBaseUrl = getApiBaseUrl;
-//# sourceMappingURL=utils.js.map
-});
+utils$1.getApiBaseUrl = getApiBaseUrl;
 
 function getUserAgent() {
     if (typeof navigator === "object" && "userAgent" in navigator) {
@@ -1448,9 +1522,11 @@ function getUserAgent() {
     return "<environment undetectable>";
 }
 
-var register_1 = register;
+var beforeAfterHook = {exports: {}};
 
-function register (state, name, method, options) {
+var register_1 = register$1;
+
+function register$1 (state, name, method, options) {
   if (typeof method !== 'function') {
     throw new Error('method for before hook must be a function')
   }
@@ -1461,7 +1537,7 @@ function register (state, name, method, options) {
 
   if (Array.isArray(name)) {
     return name.reverse().reduce(function (callback, name) {
-      return register.bind(null, state, name, callback, options)
+      return register$1.bind(null, state, name, callback, options)
     }, method)()
   }
 
@@ -1477,9 +1553,9 @@ function register (state, name, method, options) {
     })
 }
 
-var add = addHook;
+var add = addHook$1;
 
-function addHook (state, kind, name, hook) {
+function addHook$1 (state, kind, name, hook) {
   var orig = hook;
   if (!state.registry[name]) {
     state.registry[name] = [];
@@ -1524,9 +1600,9 @@ function addHook (state, kind, name, hook) {
   });
 }
 
-var remove = removeHook;
+var remove = removeHook$1;
 
-function removeHook (state, name, method) {
+function removeHook$1 (state, name, method) {
   if (!state.registry[name]) {
     return
   }
@@ -1542,18 +1618,22 @@ function removeHook (state, name, method) {
   state.registry[name].splice(index, 1);
 }
 
+var register = register_1;
+var addHook = add;
+var removeHook = remove;
+
 // bind with array of arguments: https://stackoverflow.com/a/21792913
 var bind = Function.bind;
 var bindable = bind.bind(bind);
 
 function bindApi (hook, state, name) {
-  var removeHookRef = bindable(remove, null).apply(null, name ? [state, name] : [state]);
+  var removeHookRef = bindable(removeHook, null).apply(null, name ? [state, name] : [state]);
   hook.api = { remove: removeHookRef };
   hook.remove = removeHookRef
 
   ;['before', 'error', 'after', 'wrap'].forEach(function (kind) {
     var args = name ? [state, kind, name] : [state, kind];
-    hook[kind] = hook.api[kind] = bindable(add, null).apply(null, args);
+    hook[kind] = hook.api[kind] = bindable(addHook, null).apply(null, args);
   });
 }
 
@@ -1562,7 +1642,7 @@ function HookSingular () {
   var singularHookState = {
     registry: {}
   };
-  var singularHook = register_1.bind(null, singularHookState, singularHookName);
+  var singularHook = register.bind(null, singularHookState, singularHookName);
   bindApi(singularHook, singularHookState, singularHookName);
   return singularHook
 }
@@ -1572,7 +1652,7 @@ function HookCollection () {
     registry: {}
   };
 
-  var hook = register_1.bind(null, state);
+  var hook = register.bind(null, state);
   bindApi(hook, state);
 
   return hook
@@ -1590,14 +1670,11 @@ function Hook () {
 Hook.Singular = HookSingular.bind();
 Hook.Collection = HookCollection.bind();
 
-var beforeAfterHook = Hook;
+beforeAfterHook.exports = Hook;
 // expose constructors as a named property for TypeScript
-var Hook_1 = Hook;
-var Singular = Hook.Singular;
-var Collection = Hook.Collection;
-beforeAfterHook.Hook = Hook_1;
-beforeAfterHook.Singular = Singular;
-beforeAfterHook.Collection = Collection;
+beforeAfterHook.exports.Hook = Hook;
+beforeAfterHook.exports.Singular = Hook.Singular;
+var Collection = beforeAfterHook.exports.Collection = Hook.Collection;
 
 /*!
  * is-plain-object <https://github.com/jonschlinkert/is-plain-object>
@@ -1883,7 +1960,7 @@ function expand(template, context) {
     });
 }
 
-function parse$1(options) {
+function parse$6(options) {
     // https://fetch.spec.whatwg.org/#methods
     let method = options.method.toUpperCase();
     // replace :varname with {varname} to make it RFC 6570 compatible
@@ -1962,7 +2039,7 @@ function parse$1(options) {
 }
 
 function endpointWithDefaults(defaults, route, options) {
-    return parse$1(merge(defaults, route, options));
+    return parse$6(merge(defaults, route, options));
 }
 
 function withDefaults$2(oldDefaults, newDefaults) {
@@ -1972,7 +2049,7 @@ function withDefaults$2(oldDefaults, newDefaults) {
         DEFAULTS,
         defaults: withDefaults$2.bind(null, DEFAULTS),
         merge: merge.bind(null, DEFAULTS),
-        parse: parse$1,
+        parse: parse$6,
     });
 }
 
@@ -3162,8 +3239,8 @@ Object.defineProperty(Response.prototype, Symbol.toStringTag, {
 const INTERNALS$2 = Symbol('Request internals');
 
 // fix an issue where "format", "parse" aren't a named export for node <10
-const parse_url = url__default['default'].parse;
-const format_url = url__default['default'].format;
+const parse_url = Url__default['default'].parse;
+const format_url = Url__default['default'].format;
 
 const streamDestructionSupported = 'destroy' in Stream__default['default'].Readable.prototype;
 
@@ -3404,7 +3481,7 @@ AbortError.prototype.name = 'AbortError';
 
 // fix an issue where "PassThrough", "resolve" aren't a named export for node <10
 const PassThrough$1 = Stream__default['default'].PassThrough;
-const resolve_url = url__default['default'].resolve;
+const resolve_url = Url__default['default'].resolve;
 
 /**
  * Fetch function
@@ -3428,7 +3505,7 @@ function fetch(url, opts) {
 		const request = new Request(url, opts);
 		const options = getNodeRequestOptions(request);
 
-		const send = (options.protocol === 'https:' ? https__default['default'] : http__default['default']).request;
+		const send = (options.protocol === 'https:' ? require$$3__default['default'] : http__default['default']).request;
 		const signal = request.signal;
 
 		let response = null;
@@ -3674,14 +3751,16 @@ class Deprecation extends Error {
 
 }
 
+var once$2 = {exports: {}};
+
 // Returns a wrapper function that returns a wrapped callback
 // The wrapper function should do some stuff, and return a
 // presumably different callback function.
 // This makes sure that own properties are retained, so that
 // decorations and such are not lost along the way.
-var wrappy_1 = wrappy;
-function wrappy (fn, cb) {
-  if (fn && cb) return wrappy(fn)(cb)
+var wrappy_1 = wrappy$1;
+function wrappy$1 (fn, cb) {
+  if (fn && cb) return wrappy$1(fn)(cb)
 
   if (typeof fn !== 'function')
     throw new TypeError('need wrapper function')
@@ -3708,8 +3787,9 @@ function wrappy (fn, cb) {
   }
 }
 
-var once_1 = wrappy_1(once);
-var strict = wrappy_1(onceStrict);
+var wrappy = wrappy_1;
+once$2.exports = wrappy(once);
+once$2.exports.strict = wrappy(onceStrict);
 
 once.proto = once(function () {
   Object.defineProperty(Function.prototype, 'once', {
@@ -3749,9 +3829,10 @@ function onceStrict (fn) {
   f.called = false;
   return f
 }
-once_1.strict = strict;
 
-const logOnce = once_1((deprecation) => console.warn(deprecation));
+var once$1 = once$2.exports;
+
+const logOnce = once$1((deprecation) => console.warn(deprecation));
 /**
  * Error with extra properties to help with debugging
  */
@@ -4160,6 +4241,8 @@ var distWeb$2 = /*#__PURE__*/Object.freeze({
 	__proto__: null,
 	Octokit: Octokit
 });
+
+var require$$2 = /*@__PURE__*/getAugmentedNamespace(distWeb$2);
 
 const Endpoints = {
     actions: {
@@ -5478,6 +5561,8 @@ var distWeb$1 = /*#__PURE__*/Object.freeze({
 	restEndpointMethods: restEndpointMethods
 });
 
+var require$$3 = /*@__PURE__*/getAugmentedNamespace(distWeb$1);
+
 const VERSION$1 = "2.3.1";
 
 /**
@@ -5591,41 +5676,36 @@ var distWeb = /*#__PURE__*/Object.freeze({
 	paginateRest: paginateRest
 });
 
-var core_1 = /*@__PURE__*/getAugmentedNamespace(distWeb$2);
+var require$$4 = /*@__PURE__*/getAugmentedNamespace(distWeb);
 
-var plugin_rest_endpoint_methods_1 = /*@__PURE__*/getAugmentedNamespace(distWeb$1);
-
-var plugin_paginate_rest_1 = /*@__PURE__*/getAugmentedNamespace(distWeb);
-
-var utils$1 = createCommonjsModule(function (module, exports) {
-var __createBinding = (commonjsGlobal && commonjsGlobal.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+var __createBinding$1 = (commonjsGlobal && commonjsGlobal.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
 }));
-var __setModuleDefault = (commonjsGlobal && commonjsGlobal.__setModuleDefault) || (Object.create ? (function(o, v) {
+var __setModuleDefault$1 = (commonjsGlobal && commonjsGlobal.__setModuleDefault) || (Object.create ? (function(o, v) {
     Object.defineProperty(o, "default", { enumerable: true, value: v });
 }) : function(o, v) {
     o["default"] = v;
 });
-var __importStar = (commonjsGlobal && commonjsGlobal.__importStar) || function (mod) {
+var __importStar$1 = (commonjsGlobal && commonjsGlobal.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) __createBinding$1(result, mod, k);
+    __setModuleDefault$1(result, mod);
     return result;
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getOctokitOptions = exports.GitHub = exports.context = void 0;
-const Context = __importStar(context);
-const Utils = __importStar(utils$2);
+Object.defineProperty(utils$2, "__esModule", { value: true });
+var getOctokitOptions_1 = utils$2.getOctokitOptions = GitHub = utils$2.GitHub = utils$2.context = void 0;
+const Context$1 = __importStar$1(context$1);
+const Utils = __importStar$1(utils$1);
 // octokit + plugins
-
-
-
-exports.context = new Context.Context();
+const core_1 = require$$2;
+const plugin_rest_endpoint_methods_1 = require$$3;
+const plugin_paginate_rest_1 = require$$4;
+utils$2.context = new Context$1.Context();
 const baseUrl = Utils.getApiBaseUrl();
 const defaults = {
     baseUrl,
@@ -5633,7 +5713,7 @@ const defaults = {
         agent: Utils.getProxyAgent(baseUrl)
     }
 };
-exports.GitHub = core_1.Octokit.plugin(plugin_rest_endpoint_methods_1.restEndpointMethods, plugin_paginate_rest_1.paginateRest).defaults(defaults);
+var GitHub = utils$2.GitHub = core_1.Octokit.plugin(plugin_rest_endpoint_methods_1.restEndpointMethods, plugin_paginate_rest_1.paginateRest).defaults(defaults);
 /**
  * Convience function to correctly format Octokit Options to pass into the constructor.
  *
@@ -5649,11 +5729,8 @@ function getOctokitOptions(token, options) {
     }
     return opts;
 }
-exports.getOctokitOptions = getOctokitOptions;
-//# sourceMappingURL=utils.js.map
-});
+getOctokitOptions_1 = utils$2.getOctokitOptions = getOctokitOptions;
 
-var github = createCommonjsModule(function (module, exports) {
 var __createBinding = (commonjsGlobal && commonjsGlobal.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
@@ -5673,11 +5750,11 @@ var __importStar = (commonjsGlobal && commonjsGlobal.__importStar) || function (
     __setModuleDefault(result, mod);
     return result;
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getOctokit = exports.context = void 0;
-const Context = __importStar(context);
-
-exports.context = new Context.Context();
+Object.defineProperty(github, "__esModule", { value: true });
+github.getOctokit = context = github.context = void 0;
+const Context = __importStar(context$1);
+const utils_1 = utils$2;
+var context = github.context = new Context.Context();
 /**
  * Returns a hydrated octokit ready to use for GitHub Actions
  *
@@ -5685,18 +5762,18 @@ exports.context = new Context.Context();
  * @param     options  other options to set
  */
 function getOctokit(token, options) {
-    return new utils$1.GitHub(utils$1.getOctokitOptions(token, options));
+    return new utils_1.GitHub(utils_1.getOctokitOptions(token, options));
 }
-exports.getOctokit = getOctokit;
-//# sourceMappingURL=github.js.map
-});
+github.getOctokit = getOctokit;
+
+var light = {exports: {}};
 
 /**
   * This file contains the Bottleneck library (MIT), compiled to ES2017, and without Clustering support.
   * https://github.com/SGrondin/bottleneck
   */
 
-var light = createCommonjsModule(function (module, exports) {
+(function (module, exports) {
 (function (global, factory) {
 	module.exports = factory() ;
 }(commonjsGlobal, (function () {
@@ -7213,9 +7290,11 @@ var light = createCommonjsModule(function (module, exports) {
 	return lib;
 
 })));
-});
+}(light));
 
-const VERSION = "3.4.1";
+var BottleneckLight = light.exports;
+
+const VERSION = "3.5.1";
 
 const noop = () => Promise.resolve();
 // @ts-ignore
@@ -7225,8 +7304,9 @@ function wrapRequest(state, request, options) {
 // @ts-ignore
 async function doRequest(state, request, options) {
     const isWrite = options.method !== "GET" && options.method !== "HEAD";
-    const isSearch = options.method === "GET" && options.url.startsWith("/search/");
-    const isGraphQL = options.url.startsWith("/graphql");
+    const { pathname } = new URL(options.url, "http://github.test");
+    const isSearch = options.method === "GET" && pathname.startsWith("/search/");
+    const isGraphQL = pathname.startsWith("/graphql");
     const retryCount = ~~options.request.retryCount;
     const jobOptions = retryCount > 0 ? { priority: 0, weight: 0 } : {};
     if (state.clustering) {
@@ -7241,7 +7321,7 @@ async function doRequest(state, request, options) {
         await state.write.key(state.id).schedule(jobOptions, noop);
     }
     // Guarantee at least 3000ms between requests that trigger notifications
-    if (isWrite && state.triggersNotification(options.url)) {
+    if (isWrite && state.triggersNotification(pathname)) {
         await state.notifications.key(state.id).schedule(jobOptions, noop);
     }
     // Guarantee at least 2000ms between search requests
@@ -7255,7 +7335,7 @@ async function doRequest(state, request, options) {
             // @ts-ignore
             res.data.errors.some((error) => error.type === "RATE_LIMITED")) {
             const error = Object.assign(new Error("GraphQL Rate Limit Exceeded"), {
-                headers: res.headers,
+                response: res,
                 data: res.data,
             });
             throw error;
@@ -7350,10 +7430,12 @@ const createGroups = function (Bottleneck, common) {
     });
 };
 function throttling(octokit, octokitOptions = {}) {
-    const { enabled = true, Bottleneck = light, id = "no-id", timeout = 1000 * 60 * 2, // Redis TTL: 2 minutes
-    connection, } = octokitOptions.throttle || {};
+    const { enabled = true, Bottleneck = BottleneckLight, id = "no-id", timeout = 1000 * 60 * 2, // Redis TTL: 2 minutes
+    connection,
+    // @ts-ignore
+     } = octokitOptions.throttle || {};
     if (!enabled) {
-        return;
+        return {};
     }
     const common = { connection, timeout };
     // @ts-ignore
@@ -7396,7 +7478,8 @@ function throttling(octokit, octokitOptions = {}) {
     // @ts-ignore
     state.retryLimiter.on("failed", async function (error, info) {
         const options = info.args[info.args.length - 1];
-        const shouldRetryGraphQL = options.url.startsWith("/graphql") && error.status !== 401;
+        const { pathname } = new URL(options.url, "http://github.test");
+        const shouldRetryGraphQL = pathname.startsWith("/graphql") && error.status !== 401;
         if (!(shouldRetryGraphQL || error.status === 403)) {
             return;
         }
@@ -7408,16 +7491,16 @@ function throttling(octokit, octokitOptions = {}) {
                 // https://docs.github.com/en/rest/overview/resources-in-the-rest-api#abuse-rate-limits
                 // The Retry-After header can sometimes be blank when hitting an abuse limit,
                 // but is always present after 2-3s, so make sure to set `retryAfter` to at least 5s by default.
-                const retryAfter = Math.max(~~error.headers["retry-after"], state.minimumAbuseRetryAfter);
+                const retryAfter = Math.max(~~error.response.headers["retry-after"], state.minimumAbuseRetryAfter);
                 const wantRetry = await emitter.trigger("abuse-limit", retryAfter, options, octokit);
                 return { wantRetry, retryAfter };
             }
-            if (error.headers != null &&
-                error.headers["x-ratelimit-remaining"] === "0") {
+            if (error.response.headers != null &&
+                error.response.headers["x-ratelimit-remaining"] === "0") {
                 // The user has used all their allowed calls for the current time period (REST and GraphQL)
                 // https://docs.github.com/en/rest/reference/rate-limit (REST)
                 // https://docs.github.com/en/graphql/overview/resource-limitations#rate-limit (GraphQL)
-                const rateLimitReset = new Date(~~error.headers["x-ratelimit-reset"] * 1000).getTime();
+                const rateLimitReset = new Date(~~error.response.headers["x-ratelimit-reset"] * 1000).getTime();
                 const retryAfter = Math.max(Math.ceil((rateLimitReset - Date.now()) / 1000), 0);
                 const wantRetry = await emitter.trigger("rate-limit", retryAfter, options, octokit);
                 return { wantRetry, retryAfter };
@@ -7431,11 +7514,18 @@ function throttling(octokit, octokitOptions = {}) {
         }
     });
     octokit.hook.wrap("request", wrapRequest.bind(null, state));
+    return {};
 }
 throttling.VERSION = VERSION;
 throttling.triggersNotification = triggersNotification;
 
-var utils = createCommonjsModule(function (module, exports) {
+var dist = {};
+
+var diff$1 = {exports: {}};
+
+var utils = {};
+
+(function (exports) {
 (function (global, factory) {
   {
     factory(exports);
@@ -7479,9 +7569,9 @@ var utils = createCommonjsModule(function (module, exports) {
     return isObject(o) && !o.hasOwnProperty ? _extends({}, o) : o;
   };
 });
-});
+}(utils));
 
-var diff$1 = createCommonjsModule(function (module, exports) {
+(function (module, exports) {
 (function (global, factory) {
   {
     factory(module, exports, utils);
@@ -7552,9 +7642,11 @@ var diff$1 = createCommonjsModule(function (module, exports) {
   exports.default = diff;
   module.exports = exports['default'];
 });
-});
+}(diff$1, diff$1.exports));
 
-var added = createCommonjsModule(function (module, exports) {
+var added = {exports: {}};
+
+(function (module, exports) {
 (function (global, factory) {
   {
     factory(module, exports, utils);
@@ -7617,9 +7709,11 @@ var added = createCommonjsModule(function (module, exports) {
   exports.default = addedDiff;
   module.exports = exports['default'];
 });
-});
+}(added, added.exports));
 
-var deleted = createCommonjsModule(function (module, exports) {
+var deleted = {exports: {}};
+
+(function (module, exports) {
 (function (global, factory) {
   {
     factory(module, exports, utils);
@@ -7681,9 +7775,11 @@ var deleted = createCommonjsModule(function (module, exports) {
   exports.default = deletedDiff;
   module.exports = exports['default'];
 });
-});
+}(deleted, deleted.exports));
 
-var updated = createCommonjsModule(function (module, exports) {
+var updated = {exports: {}};
+
+(function (module, exports) {
 (function (global, factory) {
   {
     factory(module, exports, utils);
@@ -7754,12 +7850,14 @@ var updated = createCommonjsModule(function (module, exports) {
   exports.default = updatedDiff;
   module.exports = exports['default'];
 });
-});
+}(updated, updated.exports));
 
-var detailed = createCommonjsModule(function (module, exports) {
+var detailed = {exports: {}};
+
+(function (module, exports) {
 (function (global, factory) {
   {
-    factory(module, exports, added, deleted, updated);
+    factory(module, exports, added.exports, deleted.exports, updated.exports);
   }
 })(commonjsGlobal, function (module, exports, _added, _deleted, _updated) {
 
@@ -7790,12 +7888,12 @@ var detailed = createCommonjsModule(function (module, exports) {
   exports.default = detailedDiff;
   module.exports = exports['default'];
 });
-});
+}(detailed, detailed.exports));
 
-var dist = createCommonjsModule(function (module, exports) {
+(function (exports) {
 (function (global, factory) {
   {
-    factory(exports, diff$1, added, deleted, updated, detailed);
+    factory(exports, diff$1.exports, added.exports, deleted.exports, updated.exports, detailed.exports);
   }
 })(commonjsGlobal, function (exports, _diff, _added, _deleted, _updated, _detailed) {
 
@@ -7826,7 +7924,9 @@ var dist = createCommonjsModule(function (module, exports) {
   exports.updatedDiff = _updated2.default;
   exports.detailedDiff = _detailed2.default;
 });
-});
+}(dist));
+
+var re$5 = {exports: {}};
 
 // Note: this is the semver.org version of the spec that it implements
 // Not necessarily the package version of this code.
@@ -7846,7 +7946,7 @@ var constants = {
   MAX_SAFE_COMPONENT_LENGTH
 };
 
-const debug = (
+const debug$3 = (
   typeof process === 'object' &&
   process.env &&
   process.env.NODE_DEBUG &&
@@ -7854,11 +7954,11 @@ const debug = (
 ) ? (...args) => console.error('SEMVER', ...args)
   : () => {};
 
-var debug_1 = debug;
+var debug_1 = debug$3;
 
-var re_1 = createCommonjsModule(function (module, exports) {
+(function (module, exports) {
 const { MAX_SAFE_COMPONENT_LENGTH } = constants;
-
+const debug = debug_1;
 exports = module.exports = {};
 
 // The actual regexps go on exports.re
@@ -7869,7 +7969,7 @@ let R = 0;
 
 const createToken = (name, value, isGlobal) => {
   const index = R++;
-  debug_1(index, value);
+  debug(index, value);
   t[name] = index;
   src[index] = value;
   re[index] = new RegExp(value, isGlobal ? 'g' : undefined);
@@ -8039,19 +8139,19 @@ createToken('STAR', '(<|>)?=?\\s*\\*');
 // >=0.0.0 is like a star
 createToken('GTE0', '^\\s*>=\\s*0\.0\.0\\s*$');
 createToken('GTE0PRE', '^\\s*>=\\s*0\.0\.0-0\\s*$');
-});
+}(re$5, re$5.exports));
 
 // parse out just the options we care about so we always get a consistent
 // obj with keys in a consistent order.
 const opts = ['includePrerelease', 'loose', 'rtl'];
-const parseOptions = options =>
+const parseOptions$4 = options =>
   !options ? {}
   : typeof options !== 'object' ? { loose: true }
   : opts.filter(k => options[k]).reduce((options, k) => {
     options[k] = true;
     return options
   }, {});
-var parseOptions_1 = parseOptions;
+var parseOptions_1 = parseOptions$4;
 
 const numeric = /^[0-9]+$/;
 const compareIdentifiers$1 = (a, b) => {
@@ -8077,16 +8177,17 @@ var identifiers = {
   rcompareIdentifiers
 };
 
+const debug$2 = debug_1;
 const { MAX_LENGTH: MAX_LENGTH$1, MAX_SAFE_INTEGER } = constants;
-const { re: re$4, t: t$4 } = re_1;
+const { re: re$4, t: t$4 } = re$5.exports;
 
-
+const parseOptions$3 = parseOptions_1;
 const { compareIdentifiers } = identifiers;
-class SemVer {
+class SemVer$e {
   constructor (version, options) {
-    options = parseOptions_1(options);
+    options = parseOptions$3(options);
 
-    if (version instanceof SemVer) {
+    if (version instanceof SemVer$e) {
       if (version.loose === !!options.loose &&
           version.includePrerelease === !!options.includePrerelease) {
         return version
@@ -8103,7 +8204,7 @@ class SemVer {
       )
     }
 
-    debug_1('SemVer', version, options);
+    debug$2('SemVer', version, options);
     this.options = options;
     this.loose = !!options.loose;
     // this isn't actually relevant for versions, but keep it so that we
@@ -8167,12 +8268,12 @@ class SemVer {
   }
 
   compare (other) {
-    debug_1('SemVer.compare', this.version, this.options, other);
-    if (!(other instanceof SemVer)) {
+    debug$2('SemVer.compare', this.version, this.options, other);
+    if (!(other instanceof SemVer$e)) {
       if (typeof other === 'string' && other === this.version) {
         return 0
       }
-      other = new SemVer(other, this.options);
+      other = new SemVer$e(other, this.options);
     }
 
     if (other.version === this.version) {
@@ -8183,8 +8284,8 @@ class SemVer {
   }
 
   compareMain (other) {
-    if (!(other instanceof SemVer)) {
-      other = new SemVer(other, this.options);
+    if (!(other instanceof SemVer$e)) {
+      other = new SemVer$e(other, this.options);
     }
 
     return (
@@ -8195,8 +8296,8 @@ class SemVer {
   }
 
   comparePre (other) {
-    if (!(other instanceof SemVer)) {
-      other = new SemVer(other, this.options);
+    if (!(other instanceof SemVer$e)) {
+      other = new SemVer$e(other, this.options);
     }
 
     // NOT having a prerelease is > having one
@@ -8212,7 +8313,7 @@ class SemVer {
     do {
       const a = this.prerelease[i];
       const b = other.prerelease[i];
-      debug_1('prerelease compare', i, a, b);
+      debug$2('prerelease compare', i, a, b);
       if (a === undefined && b === undefined) {
         return 0
       } else if (b === undefined) {
@@ -8228,15 +8329,15 @@ class SemVer {
   }
 
   compareBuild (other) {
-    if (!(other instanceof SemVer)) {
-      other = new SemVer(other, this.options);
+    if (!(other instanceof SemVer$e)) {
+      other = new SemVer$e(other, this.options);
     }
 
     let i = 0;
     do {
       const a = this.build[i];
       const b = other.build[i];
-      debug_1('prerelease compare', i, a, b);
+      debug$2('prerelease compare', i, a, b);
       if (a === undefined && b === undefined) {
         return 0
       } else if (b === undefined) {
@@ -8362,17 +8463,17 @@ class SemVer {
   }
 }
 
-var semver$1 = SemVer;
+var semver$1 = SemVer$e;
 
 const {MAX_LENGTH} = constants;
-const { re: re$3, t: t$3 } = re_1;
+const { re: re$3, t: t$3 } = re$5.exports;
+const SemVer$d = semver$1;
 
+const parseOptions$2 = parseOptions_1;
+const parse$5 = (version, options) => {
+  options = parseOptions$2(options);
 
-
-const parse = (version, options) => {
-  options = parseOptions_1(options);
-
-  if (version instanceof semver$1) {
+  if (version instanceof SemVer$d) {
     return version
   }
 
@@ -8390,25 +8491,29 @@ const parse = (version, options) => {
   }
 
   try {
-    return new semver$1(version, options)
+    return new SemVer$d(version, options)
   } catch (er) {
     return null
   }
 };
 
-var parse_1 = parse;
+var parse_1 = parse$5;
 
+const parse$4 = parse_1;
 const valid$1 = (version, options) => {
-  const v = parse_1(version, options);
+  const v = parse$4(version, options);
   return v ? v.version : null
 };
 var valid_1 = valid$1;
 
+const parse$3 = parse_1;
 const clean = (version, options) => {
-  const s = parse_1(version.trim().replace(/^[=v]+/, ''), options);
+  const s = parse$3(version.trim().replace(/^[=v]+/, ''), options);
   return s ? s.version : null
 };
 var clean_1 = clean;
+
+const SemVer$c = semver$1;
 
 const inc = (version, release, options, identifier) => {
   if (typeof (options) === 'string') {
@@ -8417,27 +8522,32 @@ const inc = (version, release, options, identifier) => {
   }
 
   try {
-    return new semver$1(version, options).inc(release, identifier).version
+    return new SemVer$c(version, options).inc(release, identifier).version
   } catch (er) {
     return null
   }
 };
 var inc_1 = inc;
 
-const compare = (a, b, loose) =>
-  new semver$1(a, loose).compare(new semver$1(b, loose));
+const SemVer$b = semver$1;
+const compare$a = (a, b, loose) =>
+  new SemVer$b(a, loose).compare(new SemVer$b(b, loose));
 
-var compare_1 = compare;
+var compare_1 = compare$a;
 
-const eq = (a, b, loose) => compare_1(a, b, loose) === 0;
-var eq_1 = eq;
+const compare$9 = compare_1;
+const eq$2 = (a, b, loose) => compare$9(a, b, loose) === 0;
+var eq_1 = eq$2;
+
+const parse$2 = parse_1;
+const eq$1 = eq_1;
 
 const diff = (version1, version2) => {
-  if (eq_1(version1, version2)) {
+  if (eq$1(version1, version2)) {
     return null
   } else {
-    const v1 = parse_1(version1);
-    const v2 = parse_1(version2);
+    const v1 = parse$2(version1);
+    const v2 = parse$2(version2);
     const hasPre = v1.prerelease.length || v2.prerelease.length;
     const prefix = hasPre ? 'pre' : '';
     const defaultResult = hasPre ? 'prerelease' : '';
@@ -8453,56 +8563,77 @@ const diff = (version1, version2) => {
 };
 var diff_1 = diff;
 
-const major = (a, loose) => new semver$1(a, loose).major;
+const SemVer$a = semver$1;
+const major = (a, loose) => new SemVer$a(a, loose).major;
 var major_1 = major;
 
-const minor = (a, loose) => new semver$1(a, loose).minor;
+const SemVer$9 = semver$1;
+const minor = (a, loose) => new SemVer$9(a, loose).minor;
 var minor_1 = minor;
 
-const patch = (a, loose) => new semver$1(a, loose).patch;
+const SemVer$8 = semver$1;
+const patch = (a, loose) => new SemVer$8(a, loose).patch;
 var patch_1 = patch;
 
+const parse$1 = parse_1;
 const prerelease = (version, options) => {
-  const parsed = parse_1(version, options);
+  const parsed = parse$1(version, options);
   return (parsed && parsed.prerelease.length) ? parsed.prerelease : null
 };
 var prerelease_1 = prerelease;
 
-const rcompare = (a, b, loose) => compare_1(b, a, loose);
+const compare$8 = compare_1;
+const rcompare = (a, b, loose) => compare$8(b, a, loose);
 var rcompare_1 = rcompare;
 
-const compareLoose = (a, b) => compare_1(a, b, true);
+const compare$7 = compare_1;
+const compareLoose = (a, b) => compare$7(a, b, true);
 var compareLoose_1 = compareLoose;
 
-const compareBuild = (a, b, loose) => {
-  const versionA = new semver$1(a, loose);
-  const versionB = new semver$1(b, loose);
+const SemVer$7 = semver$1;
+const compareBuild$2 = (a, b, loose) => {
+  const versionA = new SemVer$7(a, loose);
+  const versionB = new SemVer$7(b, loose);
   return versionA.compare(versionB) || versionA.compareBuild(versionB)
 };
-var compareBuild_1 = compareBuild;
+var compareBuild_1 = compareBuild$2;
 
-const sort = (list, loose) => list.sort((a, b) => compareBuild_1(a, b, loose));
+const compareBuild$1 = compareBuild_1;
+const sort = (list, loose) => list.sort((a, b) => compareBuild$1(a, b, loose));
 var sort_1 = sort;
 
-const rsort = (list, loose) => list.sort((a, b) => compareBuild_1(b, a, loose));
+const compareBuild = compareBuild_1;
+const rsort = (list, loose) => list.sort((a, b) => compareBuild(b, a, loose));
 var rsort_1 = rsort;
 
-const gt = (a, b, loose) => compare_1(a, b, loose) > 0;
-var gt_1 = gt;
+const compare$6 = compare_1;
+const gt$3 = (a, b, loose) => compare$6(a, b, loose) > 0;
+var gt_1 = gt$3;
 
-const lt = (a, b, loose) => compare_1(a, b, loose) < 0;
-var lt_1 = lt;
+const compare$5 = compare_1;
+const lt$2 = (a, b, loose) => compare$5(a, b, loose) < 0;
+var lt_1 = lt$2;
 
-const neq = (a, b, loose) => compare_1(a, b, loose) !== 0;
-var neq_1 = neq;
+const compare$4 = compare_1;
+const neq$1 = (a, b, loose) => compare$4(a, b, loose) !== 0;
+var neq_1 = neq$1;
 
-const gte = (a, b, loose) => compare_1(a, b, loose) >= 0;
-var gte_1 = gte;
+const compare$3 = compare_1;
+const gte$2 = (a, b, loose) => compare$3(a, b, loose) >= 0;
+var gte_1 = gte$2;
 
-const lte = (a, b, loose) => compare_1(a, b, loose) <= 0;
-var lte_1 = lte;
+const compare$2 = compare_1;
+const lte$2 = (a, b, loose) => compare$2(a, b, loose) <= 0;
+var lte_1 = lte$2;
 
-const cmp = (a, op, b, loose) => {
+const eq = eq_1;
+const neq = neq_1;
+const gt$2 = gt_1;
+const gte$1 = gte_1;
+const lt$1 = lt_1;
+const lte$1 = lte_1;
+
+const cmp$1 = (a, op, b, loose) => {
   switch (op) {
     case '===':
       if (typeof a === 'object')
@@ -8521,33 +8652,35 @@ const cmp = (a, op, b, loose) => {
     case '':
     case '=':
     case '==':
-      return eq_1(a, b, loose)
+      return eq(a, b, loose)
 
     case '!=':
-      return neq_1(a, b, loose)
+      return neq(a, b, loose)
 
     case '>':
-      return gt_1(a, b, loose)
+      return gt$2(a, b, loose)
 
     case '>=':
-      return gte_1(a, b, loose)
+      return gte$1(a, b, loose)
 
     case '<':
-      return lt_1(a, b, loose)
+      return lt$1(a, b, loose)
 
     case '<=':
-      return lte_1(a, b, loose)
+      return lte$1(a, b, loose)
 
     default:
       throw new TypeError(`Invalid operator: ${op}`)
   }
 };
-var cmp_1 = cmp;
+var cmp_1 = cmp$1;
 
-const {re: re$2, t: t$2} = re_1;
+const SemVer$6 = semver$1;
+const parse = parse_1;
+const {re: re$2, t: t$2} = re$5.exports;
 
 const coerce = (version, options) => {
-  if (version instanceof semver$1) {
+  if (version instanceof SemVer$6) {
     return version
   }
 
@@ -8590,7 +8723,7 @@ const coerce = (version, options) => {
   if (match === null)
     return null
 
-  return parse_1(`${match[2]}.${match[3] || '0'}.${match[4] || '0'}`, options)
+  return parse(`${match[2]}.${match[3] || '0'}.${match[4] || '0'}`, options)
 };
 var coerce_1 = coerce;
 
@@ -8602,15 +8735,15 @@ var iterator = function (Yallist) {
   };
 };
 
-var yallist = Yallist;
+var yallist = Yallist$1;
 
-Yallist.Node = Node;
-Yallist.create = Yallist;
+Yallist$1.Node = Node;
+Yallist$1.create = Yallist$1;
 
-function Yallist (list) {
+function Yallist$1 (list) {
   var self = this;
-  if (!(self instanceof Yallist)) {
-    self = new Yallist();
+  if (!(self instanceof Yallist$1)) {
+    self = new Yallist$1();
   }
 
   self.tail = null;
@@ -8630,7 +8763,7 @@ function Yallist (list) {
   return self
 }
 
-Yallist.prototype.removeNode = function (node) {
+Yallist$1.prototype.removeNode = function (node) {
   if (node.list !== this) {
     throw new Error('removing node which does not belong to this list')
   }
@@ -8661,7 +8794,7 @@ Yallist.prototype.removeNode = function (node) {
   return next
 };
 
-Yallist.prototype.unshiftNode = function (node) {
+Yallist$1.prototype.unshiftNode = function (node) {
   if (node === this.head) {
     return
   }
@@ -8684,7 +8817,7 @@ Yallist.prototype.unshiftNode = function (node) {
   this.length++;
 };
 
-Yallist.prototype.pushNode = function (node) {
+Yallist$1.prototype.pushNode = function (node) {
   if (node === this.tail) {
     return
   }
@@ -8707,21 +8840,21 @@ Yallist.prototype.pushNode = function (node) {
   this.length++;
 };
 
-Yallist.prototype.push = function () {
+Yallist$1.prototype.push = function () {
   for (var i = 0, l = arguments.length; i < l; i++) {
     push(this, arguments[i]);
   }
   return this.length
 };
 
-Yallist.prototype.unshift = function () {
+Yallist$1.prototype.unshift = function () {
   for (var i = 0, l = arguments.length; i < l; i++) {
     unshift(this, arguments[i]);
   }
   return this.length
 };
 
-Yallist.prototype.pop = function () {
+Yallist$1.prototype.pop = function () {
   if (!this.tail) {
     return undefined
   }
@@ -8737,7 +8870,7 @@ Yallist.prototype.pop = function () {
   return res
 };
 
-Yallist.prototype.shift = function () {
+Yallist$1.prototype.shift = function () {
   if (!this.head) {
     return undefined
   }
@@ -8753,7 +8886,7 @@ Yallist.prototype.shift = function () {
   return res
 };
 
-Yallist.prototype.forEach = function (fn, thisp) {
+Yallist$1.prototype.forEach = function (fn, thisp) {
   thisp = thisp || this;
   for (var walker = this.head, i = 0; walker !== null; i++) {
     fn.call(thisp, walker.value, i, this);
@@ -8761,7 +8894,7 @@ Yallist.prototype.forEach = function (fn, thisp) {
   }
 };
 
-Yallist.prototype.forEachReverse = function (fn, thisp) {
+Yallist$1.prototype.forEachReverse = function (fn, thisp) {
   thisp = thisp || this;
   for (var walker = this.tail, i = this.length - 1; walker !== null; i--) {
     fn.call(thisp, walker.value, i, this);
@@ -8769,7 +8902,7 @@ Yallist.prototype.forEachReverse = function (fn, thisp) {
   }
 };
 
-Yallist.prototype.get = function (n) {
+Yallist$1.prototype.get = function (n) {
   for (var i = 0, walker = this.head; walker !== null && i < n; i++) {
     // abort out of the list early if we hit a cycle
     walker = walker.next;
@@ -8779,7 +8912,7 @@ Yallist.prototype.get = function (n) {
   }
 };
 
-Yallist.prototype.getReverse = function (n) {
+Yallist$1.prototype.getReverse = function (n) {
   for (var i = 0, walker = this.tail; walker !== null && i < n; i++) {
     // abort out of the list early if we hit a cycle
     walker = walker.prev;
@@ -8789,9 +8922,9 @@ Yallist.prototype.getReverse = function (n) {
   }
 };
 
-Yallist.prototype.map = function (fn, thisp) {
+Yallist$1.prototype.map = function (fn, thisp) {
   thisp = thisp || this;
-  var res = new Yallist();
+  var res = new Yallist$1();
   for (var walker = this.head; walker !== null;) {
     res.push(fn.call(thisp, walker.value, this));
     walker = walker.next;
@@ -8799,9 +8932,9 @@ Yallist.prototype.map = function (fn, thisp) {
   return res
 };
 
-Yallist.prototype.mapReverse = function (fn, thisp) {
+Yallist$1.prototype.mapReverse = function (fn, thisp) {
   thisp = thisp || this;
-  var res = new Yallist();
+  var res = new Yallist$1();
   for (var walker = this.tail; walker !== null;) {
     res.push(fn.call(thisp, walker.value, this));
     walker = walker.prev;
@@ -8809,7 +8942,7 @@ Yallist.prototype.mapReverse = function (fn, thisp) {
   return res
 };
 
-Yallist.prototype.reduce = function (fn, initial) {
+Yallist$1.prototype.reduce = function (fn, initial) {
   var acc;
   var walker = this.head;
   if (arguments.length > 1) {
@@ -8829,7 +8962,7 @@ Yallist.prototype.reduce = function (fn, initial) {
   return acc
 };
 
-Yallist.prototype.reduceReverse = function (fn, initial) {
+Yallist$1.prototype.reduceReverse = function (fn, initial) {
   var acc;
   var walker = this.tail;
   if (arguments.length > 1) {
@@ -8849,7 +8982,7 @@ Yallist.prototype.reduceReverse = function (fn, initial) {
   return acc
 };
 
-Yallist.prototype.toArray = function () {
+Yallist$1.prototype.toArray = function () {
   var arr = new Array(this.length);
   for (var i = 0, walker = this.head; walker !== null; i++) {
     arr[i] = walker.value;
@@ -8858,7 +8991,7 @@ Yallist.prototype.toArray = function () {
   return arr
 };
 
-Yallist.prototype.toArrayReverse = function () {
+Yallist$1.prototype.toArrayReverse = function () {
   var arr = new Array(this.length);
   for (var i = 0, walker = this.tail; walker !== null; i++) {
     arr[i] = walker.value;
@@ -8867,7 +9000,7 @@ Yallist.prototype.toArrayReverse = function () {
   return arr
 };
 
-Yallist.prototype.slice = function (from, to) {
+Yallist$1.prototype.slice = function (from, to) {
   to = to || this.length;
   if (to < 0) {
     to += this.length;
@@ -8876,7 +9009,7 @@ Yallist.prototype.slice = function (from, to) {
   if (from < 0) {
     from += this.length;
   }
-  var ret = new Yallist();
+  var ret = new Yallist$1();
   if (to < from || to < 0) {
     return ret
   }
@@ -8895,7 +9028,7 @@ Yallist.prototype.slice = function (from, to) {
   return ret
 };
 
-Yallist.prototype.sliceReverse = function (from, to) {
+Yallist$1.prototype.sliceReverse = function (from, to) {
   to = to || this.length;
   if (to < 0) {
     to += this.length;
@@ -8904,7 +9037,7 @@ Yallist.prototype.sliceReverse = function (from, to) {
   if (from < 0) {
     from += this.length;
   }
-  var ret = new Yallist();
+  var ret = new Yallist$1();
   if (to < from || to < 0) {
     return ret
   }
@@ -8923,7 +9056,7 @@ Yallist.prototype.sliceReverse = function (from, to) {
   return ret
 };
 
-Yallist.prototype.splice = function (start, deleteCount, ...nodes) {
+Yallist$1.prototype.splice = function (start, deleteCount, ...nodes) {
   if (start > this.length) {
     start = this.length - 1;
   }
@@ -8954,7 +9087,7 @@ Yallist.prototype.splice = function (start, deleteCount, ...nodes) {
   return ret;
 };
 
-Yallist.prototype.reverse = function () {
+Yallist$1.prototype.reverse = function () {
   var head = this.head;
   var tail = this.tail;
   for (var walker = head; walker !== null; walker = walker.prev) {
@@ -9025,11 +9158,11 @@ function Node (value, prev, next, list) {
 
 try {
   // add if support for Symbol.iterator is present
-  iterator(Yallist);
+  iterator(Yallist$1);
 } catch (er) {}
 
 // A linked list to keep track of recently-used-ness
-
+const Yallist = yallist;
 
 const MAX = Symbol('max');
 const LENGTH = Symbol('length');
@@ -9161,7 +9294,7 @@ class LRUCache {
     }
 
     this[CACHE] = new Map(); // hash of items by key
-    this[LRU_LIST] = new yallist(); // list of items in order of use recency
+    this[LRU_LIST] = new Yallist(); // list of items in order of use recency
     this[LENGTH] = 0; // length of items in the list
   }
 
@@ -9362,22 +9495,22 @@ const forEachStep = (self, fn, node, thisp) => {
 var lruCache = LRUCache;
 
 // hoisted class for cyclic dependency
-class Range {
+class Range$a {
   constructor (range, options) {
-    options = parseOptions_1(options);
+    options = parseOptions$1(options);
 
-    if (range instanceof Range) {
+    if (range instanceof Range$a) {
       if (
         range.loose === !!options.loose &&
         range.includePrerelease === !!options.includePrerelease
       ) {
         return range
       } else {
-        return new Range(range.raw, options)
+        return new Range$a(range.raw, options)
       }
     }
 
-    if (range instanceof comparator) {
+    if (range instanceof Comparator$3) {
       // just put it in the set and return
       this.raw = range.value;
       this.set = [[range]];
@@ -9454,10 +9587,10 @@ class Range {
     // `1.2.3 - 1.2.4` => `>=1.2.3 <=1.2.4`
     const hr = loose ? re$1[t$1.HYPHENRANGELOOSE] : re$1[t$1.HYPHENRANGE];
     range = range.replace(hr, hyphenReplace(this.options.includePrerelease));
-    debug_1('hyphen replace', range);
+    debug$1('hyphen replace', range);
     // `> 1.2.3 < 1.2.5` => `>1.2.3 <1.2.5`
     range = range.replace(re$1[t$1.COMPARATORTRIM], comparatorTrimReplace);
-    debug_1('comparator trim', range, re$1[t$1.COMPARATORTRIM]);
+    debug$1('comparator trim', range, re$1[t$1.COMPARATORTRIM]);
 
     // `~ 1.2.3` => `~1.2.3`
     range = range.replace(re$1[t$1.TILDETRIM], tildeTrimReplace);
@@ -9481,7 +9614,7 @@ class Range {
       .map(comp => replaceGTE0(comp, this.options))
       // in loose mode, throw out any that are not valid comparators
       .filter(this.options.loose ? comp => !!comp.match(compRe) : () => true)
-      .map(comp => new comparator(comp, this.options));
+      .map(comp => new Comparator$3(comp, this.options));
 
     // if any comparators are the null set, then replace with JUST null set
     // if more than one comparator, remove any * comparators
@@ -9502,7 +9635,7 @@ class Range {
   }
 
   intersects (range, options) {
-    if (!(range instanceof Range)) {
+    if (!(range instanceof Range$a)) {
       throw new TypeError('a Range is required')
     }
 
@@ -9531,7 +9664,7 @@ class Range {
 
     if (typeof version === 'string') {
       try {
-        version = new semver$1(version, this.options);
+        version = new SemVer$5(version, this.options);
       } catch (er) {
         return false
       }
@@ -9545,22 +9678,22 @@ class Range {
     return false
   }
 }
-var range = Range;
+var range = Range$a;
 
+const LRU = lruCache;
+const cache = new LRU({ max: 1000 });
 
-const cache = new lruCache({ max: 1000 });
-
-
-
-
-
+const parseOptions$1 = parseOptions_1;
+const Comparator$3 = comparator;
+const debug$1 = debug_1;
+const SemVer$5 = semver$1;
 const {
   re: re$1,
   t: t$1,
   comparatorTrimReplace,
   tildeTrimReplace,
   caretTrimReplace
-} = re_1;
+} = re$5.exports;
 
 const isNullSet = c => c.value === '<0.0.0-0';
 const isAny = c => c.value === '';
@@ -9587,15 +9720,15 @@ const isSatisfiable = (comparators, options) => {
 // already replaced the hyphen ranges
 // turn into a set of JUST comparators.
 const parseComparator = (comp, options) => {
-  debug_1('comp', comp, options);
+  debug$1('comp', comp, options);
   comp = replaceCarets(comp, options);
-  debug_1('caret', comp);
+  debug$1('caret', comp);
   comp = replaceTildes(comp, options);
-  debug_1('tildes', comp);
+  debug$1('tildes', comp);
   comp = replaceXRanges(comp, options);
-  debug_1('xrange', comp);
+  debug$1('xrange', comp);
   comp = replaceStars(comp, options);
-  debug_1('stars', comp);
+  debug$1('stars', comp);
   return comp
 };
 
@@ -9615,7 +9748,7 @@ const replaceTildes = (comp, options) =>
 const replaceTilde = (comp, options) => {
   const r = options.loose ? re$1[t$1.TILDELOOSE] : re$1[t$1.TILDE];
   return comp.replace(r, (_, M, m, p, pr) => {
-    debug_1('tilde', comp, _, M, m, p, pr);
+    debug$1('tilde', comp, _, M, m, p, pr);
     let ret;
 
     if (isX(M)) {
@@ -9626,7 +9759,7 @@ const replaceTilde = (comp, options) => {
       // ~1.2 == >=1.2.0 <1.3.0-0
       ret = `>=${M}.${m}.0 <${M}.${+m + 1}.0-0`;
     } else if (pr) {
-      debug_1('replaceTilde pr', pr);
+      debug$1('replaceTilde pr', pr);
       ret = `>=${M}.${m}.${p}-${pr
       } <${M}.${+m + 1}.0-0`;
     } else {
@@ -9635,7 +9768,7 @@ const replaceTilde = (comp, options) => {
       } <${M}.${+m + 1}.0-0`;
     }
 
-    debug_1('tilde return', ret);
+    debug$1('tilde return', ret);
     return ret
   })
 };
@@ -9652,11 +9785,11 @@ const replaceCarets = (comp, options) =>
   }).join(' ');
 
 const replaceCaret = (comp, options) => {
-  debug_1('caret', comp, options);
+  debug$1('caret', comp, options);
   const r = options.loose ? re$1[t$1.CARETLOOSE] : re$1[t$1.CARET];
   const z = options.includePrerelease ? '-0' : '';
   return comp.replace(r, (_, M, m, p, pr) => {
-    debug_1('caret', comp, _, M, m, p, pr);
+    debug$1('caret', comp, _, M, m, p, pr);
     let ret;
 
     if (isX(M)) {
@@ -9670,7 +9803,7 @@ const replaceCaret = (comp, options) => {
         ret = `>=${M}.${m}.0${z} <${+M + 1}.0.0-0`;
       }
     } else if (pr) {
-      debug_1('replaceCaret pr', pr);
+      debug$1('replaceCaret pr', pr);
       if (M === '0') {
         if (m === '0') {
           ret = `>=${M}.${m}.${p}-${pr
@@ -9684,7 +9817,7 @@ const replaceCaret = (comp, options) => {
         } <${+M + 1}.0.0-0`;
       }
     } else {
-      debug_1('no pr');
+      debug$1('no pr');
       if (M === '0') {
         if (m === '0') {
           ret = `>=${M}.${m}.${p
@@ -9699,13 +9832,13 @@ const replaceCaret = (comp, options) => {
       }
     }
 
-    debug_1('caret return', ret);
+    debug$1('caret return', ret);
     return ret
   })
 };
 
 const replaceXRanges = (comp, options) => {
-  debug_1('replaceXRanges', comp, options);
+  debug$1('replaceXRanges', comp, options);
   return comp.split(/\s+/).map((comp) => {
     return replaceXRange(comp, options)
   }).join(' ')
@@ -9715,7 +9848,7 @@ const replaceXRange = (comp, options) => {
   comp = comp.trim();
   const r = options.loose ? re$1[t$1.XRANGELOOSE] : re$1[t$1.XRANGE];
   return comp.replace(r, (ret, gtlt, M, m, p, pr) => {
-    debug_1('xRange', comp, ret, gtlt, M, m, p, pr);
+    debug$1('xRange', comp, ret, gtlt, M, m, p, pr);
     const xM = isX(M);
     const xm = xM || isX(m);
     const xp = xm || isX(p);
@@ -9779,7 +9912,7 @@ const replaceXRange = (comp, options) => {
       } <${M}.${+m + 1}.0-0`;
     }
 
-    debug_1('xRange return', ret);
+    debug$1('xRange return', ret);
 
     return ret
   })
@@ -9788,13 +9921,13 @@ const replaceXRange = (comp, options) => {
 // Because * is AND-ed with everything else in the comparator,
 // and '' means "any version", just remove the *s entirely.
 const replaceStars = (comp, options) => {
-  debug_1('replaceStars', comp, options);
+  debug$1('replaceStars', comp, options);
   // Looseness is ignored here.  star is always as loose as it gets!
   return comp.trim().replace(re$1[t$1.STAR], '')
 };
 
 const replaceGTE0 = (comp, options) => {
-  debug_1('replaceGTE0', comp, options);
+  debug$1('replaceGTE0', comp, options);
   return comp.trim()
     .replace(re$1[options.includePrerelease ? t$1.GTE0PRE : t$1.GTE0], '')
 };
@@ -9850,8 +9983,8 @@ const testSet = (set, version, options) => {
     // However, `1.2.4-alpha.notready` should NOT be allowed,
     // even though it's within the range set by the comparators.
     for (let i = 0; i < set.length; i++) {
-      debug_1(set[i].semver);
-      if (set[i].semver === comparator.ANY) {
+      debug$1(set[i].semver);
+      if (set[i].semver === Comparator$3.ANY) {
         continue
       }
 
@@ -9874,14 +10007,14 @@ const testSet = (set, version, options) => {
 
 const ANY$2 = Symbol('SemVer ANY');
 // hoisted class for cyclic dependency
-class Comparator {
+class Comparator$2 {
   static get ANY () {
     return ANY$2
   }
   constructor (comp, options) {
-    options = parseOptions_1(options);
+    options = parseOptions(options);
 
-    if (comp instanceof Comparator) {
+    if (comp instanceof Comparator$2) {
       if (comp.loose === !!options.loose) {
         return comp
       } else {
@@ -9889,7 +10022,7 @@ class Comparator {
       }
     }
 
-    debug_1('comparator', comp, options);
+    debug('comparator', comp, options);
     this.options = options;
     this.loose = !!options.loose;
     this.parse(comp);
@@ -9900,7 +10033,7 @@ class Comparator {
       this.value = this.operator + this.semver.version;
     }
 
-    debug_1('comp', this);
+    debug('comp', this);
   }
 
   parse (comp) {
@@ -9920,7 +10053,7 @@ class Comparator {
     if (!m[2]) {
       this.semver = ANY$2;
     } else {
-      this.semver = new semver$1(m[2], this.options.loose);
+      this.semver = new SemVer$4(m[2], this.options.loose);
     }
   }
 
@@ -9929,7 +10062,7 @@ class Comparator {
   }
 
   test (version) {
-    debug_1('Comparator.test', version, this.options.loose);
+    debug('Comparator.test', version, this.options.loose);
 
     if (this.semver === ANY$2 || version === ANY$2) {
       return true
@@ -9937,17 +10070,17 @@ class Comparator {
 
     if (typeof version === 'string') {
       try {
-        version = new semver$1(version, this.options);
+        version = new SemVer$4(version, this.options);
       } catch (er) {
         return false
       }
     }
 
-    return cmp_1(version, this.operator, this.semver, this.options)
+    return cmp(version, this.operator, this.semver, this.options)
   }
 
   intersects (comp, options) {
-    if (!(comp instanceof Comparator)) {
+    if (!(comp instanceof Comparator$2)) {
       throw new TypeError('a Comparator is required')
     }
 
@@ -9962,12 +10095,12 @@ class Comparator {
       if (this.value === '') {
         return true
       }
-      return new range(comp.value, options).test(this.value)
+      return new Range$9(comp.value, options).test(this.value)
     } else if (comp.operator === '') {
       if (comp.value === '') {
         return true
       }
-      return new range(this.value, options).test(comp.semver)
+      return new Range$9(this.value, options).test(comp.semver)
     }
 
     const sameDirectionIncreasing =
@@ -9981,11 +10114,11 @@ class Comparator {
       (this.operator === '>=' || this.operator === '<=') &&
       (comp.operator === '>=' || comp.operator === '<=');
     const oppositeDirectionsLessThan =
-      cmp_1(this.semver, '<', comp.semver, options) &&
+      cmp(this.semver, '<', comp.semver, options) &&
       (this.operator === '>=' || this.operator === '>') &&
         (comp.operator === '<=' || comp.operator === '<');
     const oppositeDirectionsGreaterThan =
-      cmp_1(this.semver, '>', comp.semver, options) &&
+      cmp(this.semver, '>', comp.semver, options) &&
       (this.operator === '<=' || this.operator === '<') &&
         (comp.operator === '>=' || comp.operator === '>');
 
@@ -9999,34 +10132,44 @@ class Comparator {
   }
 }
 
-var comparator = Comparator;
+var comparator = Comparator$2;
 
+const parseOptions = parseOptions_1;
+const {re, t} = re$5.exports;
+const cmp = cmp_1;
+const debug = debug_1;
+const SemVer$4 = semver$1;
+const Range$9 = range;
 
-const {re, t} = re_1;
-
-const satisfies = (version, range$1, options) => {
+const Range$8 = range;
+const satisfies$3 = (version, range, options) => {
   try {
-    range$1 = new range(range$1, options);
+    range = new Range$8(range, options);
   } catch (er) {
     return false
   }
-  return range$1.test(version)
+  return range.test(version)
 };
-var satisfies_1 = satisfies;
+var satisfies_1 = satisfies$3;
+
+const Range$7 = range;
 
 // Mostly just for testing and legacy API reasons
-const toComparators = (range$1, options) =>
-  new range(range$1, options).set
+const toComparators = (range, options) =>
+  new Range$7(range, options).set
     .map(comp => comp.map(c => c.value).join(' ').trim().split(' '));
 
 var toComparators_1 = toComparators;
 
-const maxSatisfying = (versions, range$1, options) => {
+const SemVer$3 = semver$1;
+const Range$6 = range;
+
+const maxSatisfying = (versions, range, options) => {
   let max = null;
   let maxSV = null;
   let rangeObj = null;
   try {
-    rangeObj = new range(range$1, options);
+    rangeObj = new Range$6(range, options);
   } catch (er) {
     return null
   }
@@ -10036,7 +10179,7 @@ const maxSatisfying = (versions, range$1, options) => {
       if (!max || maxSV.compare(v) === -1) {
         // compare(max, v, true)
         max = v;
-        maxSV = new semver$1(max, options);
+        maxSV = new SemVer$3(max, options);
       }
     }
   });
@@ -10044,12 +10187,14 @@ const maxSatisfying = (versions, range$1, options) => {
 };
 var maxSatisfying_1 = maxSatisfying;
 
-const minSatisfying = (versions, range$1, options) => {
+const SemVer$2 = semver$1;
+const Range$5 = range;
+const minSatisfying = (versions, range, options) => {
   let min = null;
   let minSV = null;
   let rangeObj = null;
   try {
-    rangeObj = new range(range$1, options);
+    rangeObj = new Range$5(range, options);
   } catch (er) {
     return null
   }
@@ -10059,7 +10204,7 @@ const minSatisfying = (versions, range$1, options) => {
       if (!min || minSV.compare(v) === 1) {
         // compare(min, v, true)
         min = v;
-        minSV = new semver$1(min, options);
+        minSV = new SemVer$2(min, options);
       }
     }
   });
@@ -10067,27 +10212,31 @@ const minSatisfying = (versions, range$1, options) => {
 };
 var minSatisfying_1 = minSatisfying;
 
-const minVersion = (range$1, loose) => {
-  range$1 = new range(range$1, loose);
+const SemVer$1 = semver$1;
+const Range$4 = range;
+const gt$1 = gt_1;
 
-  let minver = new semver$1('0.0.0');
-  if (range$1.test(minver)) {
+const minVersion = (range, loose) => {
+  range = new Range$4(range, loose);
+
+  let minver = new SemVer$1('0.0.0');
+  if (range.test(minver)) {
     return minver
   }
 
-  minver = new semver$1('0.0.0-0');
-  if (range$1.test(minver)) {
+  minver = new SemVer$1('0.0.0-0');
+  if (range.test(minver)) {
     return minver
   }
 
   minver = null;
-  for (let i = 0; i < range$1.set.length; ++i) {
-    const comparators = range$1.set[i];
+  for (let i = 0; i < range.set.length; ++i) {
+    const comparators = range.set[i];
 
     let setMin = null;
     comparators.forEach((comparator) => {
       // Clone to avoid manipulating the comparator's semver object.
-      const compver = new semver$1(comparator.semver.version);
+      const compver = new SemVer$1(comparator.semver.version);
       switch (comparator.operator) {
         case '>':
           if (compver.prerelease.length === 0) {
@@ -10099,7 +10248,7 @@ const minVersion = (range$1, loose) => {
           /* fallthrough */
         case '':
         case '>=':
-          if (!setMin || gt_1(compver, setMin)) {
+          if (!setMin || gt$1(compver, setMin)) {
             setMin = compver;
           }
           break
@@ -10112,11 +10261,11 @@ const minVersion = (range$1, loose) => {
           throw new Error(`Unexpected operation: ${comparator.operator}`)
       }
     });
-    if (setMin && (!minver || gt_1(minver, setMin)))
+    if (setMin && (!minver || gt$1(minver, setMin)))
       minver = setMin;
   }
 
-  if (minver && range$1.test(minver)) {
+  if (minver && range.test(minver)) {
     return minver
   }
 
@@ -10124,42 +10273,45 @@ const minVersion = (range$1, loose) => {
 };
 var minVersion_1 = minVersion;
 
-const validRange = (range$1, options) => {
+const Range$3 = range;
+const validRange = (range, options) => {
   try {
     // Return '*' instead of '' so that truthiness works.
     // This will throw if it's invalid anyway
-    return new range(range$1, options).range || '*'
+    return new Range$3(range, options).range || '*'
   } catch (er) {
     return null
   }
 };
 var valid = validRange;
 
-const {ANY: ANY$1} = comparator;
+const SemVer = semver$1;
+const Comparator$1 = comparator;
+const {ANY: ANY$1} = Comparator$1;
+const Range$2 = range;
+const satisfies$2 = satisfies_1;
+const gt = gt_1;
+const lt = lt_1;
+const lte = lte_1;
+const gte = gte_1;
 
-
-
-
-
-
-
-const outside = (version, range$1, hilo, options) => {
-  version = new semver$1(version, options);
-  range$1 = new range(range$1, options);
+const outside$2 = (version, range, hilo, options) => {
+  version = new SemVer(version, options);
+  range = new Range$2(range, options);
 
   let gtfn, ltefn, ltfn, comp, ecomp;
   switch (hilo) {
     case '>':
-      gtfn = gt_1;
-      ltefn = lte_1;
-      ltfn = lt_1;
+      gtfn = gt;
+      ltefn = lte;
+      ltfn = lt;
       comp = '>';
       ecomp = '>=';
       break
     case '<':
-      gtfn = lt_1;
-      ltefn = gte_1;
-      ltfn = gt_1;
+      gtfn = lt;
+      ltefn = gte;
+      ltfn = gt;
       comp = '<';
       ecomp = '<=';
       break
@@ -10168,29 +10320,29 @@ const outside = (version, range$1, hilo, options) => {
   }
 
   // If it satisfies the range it is not outside
-  if (satisfies_1(version, range$1, options)) {
+  if (satisfies$2(version, range, options)) {
     return false
   }
 
   // From now on, variable terms are as if we're in "gtr" mode.
   // but note that everything is flipped for the "ltr" function.
 
-  for (let i = 0; i < range$1.set.length; ++i) {
-    const comparators = range$1.set[i];
+  for (let i = 0; i < range.set.length; ++i) {
+    const comparators = range.set[i];
 
     let high = null;
     let low = null;
 
-    comparators.forEach((comparator$1) => {
-      if (comparator$1.semver === ANY$1) {
-        comparator$1 = new comparator('>=0.0.0');
+    comparators.forEach((comparator) => {
+      if (comparator.semver === ANY$1) {
+        comparator = new Comparator$1('>=0.0.0');
       }
-      high = high || comparator$1;
-      low = low || comparator$1;
-      if (gtfn(comparator$1.semver, high.semver, options)) {
-        high = comparator$1;
-      } else if (ltfn(comparator$1.semver, low.semver, options)) {
-        low = comparator$1;
+      high = high || comparator;
+      low = low || comparator;
+      if (gtfn(comparator.semver, high.semver, options)) {
+        high = comparator;
+      } else if (ltfn(comparator.semver, low.semver, options)) {
+        low = comparator;
       }
     });
 
@@ -10212,20 +10364,22 @@ const outside = (version, range$1, hilo, options) => {
   return true
 };
 
-var outside_1 = outside;
+var outside_1 = outside$2;
 
 // Determine if version is greater than all the versions possible in the range.
-
-const gtr = (version, range, options) => outside_1(version, range, '>', options);
+const outside$1 = outside_1;
+const gtr = (version, range, options) => outside$1(version, range, '>', options);
 var gtr_1 = gtr;
 
+const outside = outside_1;
 // Determine if version is less than all the versions possible in the range
-const ltr = (version, range, options) => outside_1(version, range, '<', options);
+const ltr = (version, range, options) => outside(version, range, '<', options);
 var ltr_1 = ltr;
 
+const Range$1 = range;
 const intersects = (r1, r2, options) => {
-  r1 = new range(r1, options);
-  r2 = new range(r2, options);
+  r1 = new Range$1(r1, options);
+  r2 = new Range$1(r2, options);
   return r1.intersects(r2)
 };
 var intersects_1 = intersects;
@@ -10233,15 +10387,15 @@ var intersects_1 = intersects;
 // given a set of versions and a range, create a "simplified" range
 // that includes the same versions that the original range does
 // If the original range is shorter than the simplified one, return that.
-
-
+const satisfies$1 = satisfies_1;
+const compare$1 = compare_1;
 var simplify = (versions, range, options) => {
   const set = [];
   let min = null;
   let prev = null;
-  const v = versions.sort((a, b) => compare_1(a, b, options));
+  const v = versions.sort((a, b) => compare$1(a, b, options));
   for (const version of v) {
-    const included = satisfies_1(version, range, options);
+    const included = satisfies$1(version, range, options);
     if (included) {
       prev = version;
       if (!min)
@@ -10275,22 +10429,31 @@ var simplify = (versions, range, options) => {
   return simplified.length < original.length ? simplified : range
 };
 
-const { ANY } = comparator;
-
-
+const Range = range;
+const Comparator = comparator;
+const { ANY } = Comparator;
+const satisfies = satisfies_1;
+const compare = compare_1;
 
 // Complex range `r1 || r2 || ...` is a subset of `R1 || R2 || ...` iff:
-// - Every simple range `r1, r2, ...` is a subset of some `R1, R2, ...`
+// - Every simple range `r1, r2, ...` is a null set, OR
+// - Every simple range `r1, r2, ...` which is not a null set is a subset of
+//   some `R1, R2, ...`
 //
 // Simple range `c1 c2 ...` is a subset of simple range `C1 C2 ...` iff:
 // - If c is only the ANY comparator
 //   - If C is only the ANY comparator, return true
-//   - Else return false
+//   - Else if in prerelease mode, return false
+//   - else replace c with `[>=0.0.0]`
+// - If C is only the ANY comparator
+//   - if in prerelease mode, return true
+//   - else replace C with `[>=0.0.0]`
 // - Let EQ be the set of = comparators in c
 // - If EQ is more than one, return true (null set)
 // - Let GT be the highest > or >= comparator in c
 // - Let LT be the lowest < or <= comparator in c
 // - If GT and LT, and GT.semver > LT.semver, return true (null set)
+// - If any C is a = range, and GT or LT are set, return false
 // - If EQ
 //   - If GT, and EQ does not satisfy GT, return true (null set)
 //   - If LT, and EQ does not satisfy LT, return true (null set)
@@ -10299,18 +10462,21 @@ const { ANY } = comparator;
 // - If GT
 //   - If GT.semver is lower than any > or >= comp in C, return false
 //   - If GT is >=, and GT.semver does not satisfy every C, return false
+//   - If GT.semver has a prerelease, and not in prerelease mode
+//     - If no C has a prerelease and the GT.semver tuple, return false
 // - If LT
 //   - If LT.semver is greater than any < or <= comp in C, return false
 //   - If LT is <=, and LT.semver does not satisfy every C, return false
-// - If any C is a = range, and GT or LT are set, return false
+//   - If GT.semver has a prerelease, and not in prerelease mode
+//     - If no C has a prerelease and the LT.semver tuple, return false
 // - Else return true
 
-const subset = (sub, dom, options) => {
+const subset = (sub, dom, options = {}) => {
   if (sub === dom)
     return true
 
-  sub = new range(sub, options);
-  dom = new range(dom, options);
+  sub = new Range(sub, options);
+  dom = new Range(dom, options);
   let sawNonNull = false;
 
   OUTER: for (const simpleSub of sub.set) {
@@ -10334,8 +10500,21 @@ const simpleSubset = (sub, dom, options) => {
   if (sub === dom)
     return true
 
-  if (sub.length === 1 && sub[0].semver === ANY)
-    return dom.length === 1 && dom[0].semver === ANY
+  if (sub.length === 1 && sub[0].semver === ANY) {
+    if (dom.length === 1 && dom[0].semver === ANY)
+      return true
+    else if (options.includePrerelease)
+      sub = [ new Comparator('>=0.0.0-0') ];
+    else
+      sub = [ new Comparator('>=0.0.0') ];
+  }
+
+  if (dom.length === 1 && dom[0].semver === ANY) {
+    if (options.includePrerelease)
+      return true
+    else
+      dom = [ new Comparator('>=0.0.0') ];
+  }
 
   const eqSet = new Set();
   let gt, lt;
@@ -10353,7 +10532,7 @@ const simpleSubset = (sub, dom, options) => {
 
   let gtltComp;
   if (gt && lt) {
-    gtltComp = compare_1(gt.semver, lt.semver, options);
+    gtltComp = compare(gt.semver, lt.semver, options);
     if (gtltComp > 0)
       return null
     else if (gtltComp === 0 && (gt.operator !== '>=' || lt.operator !== '<='))
@@ -10362,14 +10541,14 @@ const simpleSubset = (sub, dom, options) => {
 
   // will iterate one or zero times
   for (const eq of eqSet) {
-    if (gt && !satisfies_1(eq, String(gt), options))
+    if (gt && !satisfies(eq, String(gt), options))
       return null
 
-    if (lt && !satisfies_1(eq, String(lt), options))
+    if (lt && !satisfies(eq, String(lt), options))
       return null
 
     for (const c of dom) {
-      if (!satisfies_1(eq, String(c), options))
+      if (!satisfies(eq, String(c), options))
         return false
     }
 
@@ -10378,23 +10557,53 @@ const simpleSubset = (sub, dom, options) => {
 
   let higher, lower;
   let hasDomLT, hasDomGT;
+  // if the subset has a prerelease, we need a comparator in the superset
+  // with the same tuple and a prerelease, or it's not a subset
+  let needDomLTPre = lt &&
+    !options.includePrerelease &&
+    lt.semver.prerelease.length ? lt.semver : false;
+  let needDomGTPre = gt &&
+    !options.includePrerelease &&
+    gt.semver.prerelease.length ? gt.semver : false;
+  // exception: <1.2.3-0 is the same as <1.2.3
+  if (needDomLTPre && needDomLTPre.prerelease.length === 1 &&
+      lt.operator === '<' && needDomLTPre.prerelease[0] === 0) {
+    needDomLTPre = false;
+  }
+
   for (const c of dom) {
     hasDomGT = hasDomGT || c.operator === '>' || c.operator === '>=';
     hasDomLT = hasDomLT || c.operator === '<' || c.operator === '<=';
     if (gt) {
+      if (needDomGTPre) {
+        if (c.semver.prerelease && c.semver.prerelease.length &&
+            c.semver.major === needDomGTPre.major &&
+            c.semver.minor === needDomGTPre.minor &&
+            c.semver.patch === needDomGTPre.patch) {
+          needDomGTPre = false;
+        }
+      }
       if (c.operator === '>' || c.operator === '>=') {
         higher = higherGT(gt, c, options);
         if (higher === c && higher !== gt)
           return false
-      } else if (gt.operator === '>=' && !satisfies_1(gt.semver, String(c), options))
+      } else if (gt.operator === '>=' && !satisfies(gt.semver, String(c), options))
         return false
     }
     if (lt) {
+      if (needDomLTPre) {
+        if (c.semver.prerelease && c.semver.prerelease.length &&
+            c.semver.major === needDomLTPre.major &&
+            c.semver.minor === needDomLTPre.minor &&
+            c.semver.patch === needDomLTPre.patch) {
+          needDomLTPre = false;
+        }
+      }
       if (c.operator === '<' || c.operator === '<=') {
         lower = lowerLT(lt, c, options);
         if (lower === c && lower !== lt)
           return false
-      } else if (lt.operator === '<=' && !satisfies_1(lt.semver, String(c), options))
+      } else if (lt.operator === '<=' && !satisfies(lt.semver, String(c), options))
         return false
     }
     if (!c.operator && (lt || gt) && gtltComp !== 0)
@@ -10410,6 +10619,12 @@ const simpleSubset = (sub, dom, options) => {
   if (lt && hasDomGT && !gt && gtltComp !== 0)
     return false
 
+  // we needed a prerelease range in a specific tuple, but didn't get one
+  // then this isn't a subset.  eg >=1.2.3-pre is not a subset of >=1.0.0,
+  // because it includes prereleases in the 1.2.3 tuple
+  if (needDomGTPre || needDomLTPre)
+    return false
+
   return true
 };
 
@@ -10417,7 +10632,7 @@ const simpleSubset = (sub, dom, options) => {
 const higherGT = (a, b, options) => {
   if (!a)
     return b
-  const comp = compare_1(a.semver, b.semver, options);
+  const comp = compare(a.semver, b.semver, options);
   return comp > 0 ? a
     : comp < 0 ? b
     : b.operator === '>' && a.operator === '>=' ? b
@@ -10428,7 +10643,7 @@ const higherGT = (a, b, options) => {
 const lowerLT = (a, b, options) => {
   if (!a)
     return b
-  const comp = compare_1(a.semver, b.semver, options);
+  const comp = compare(a.semver, b.semver, options);
   return comp < 0 ? a
     : comp > 0 ? b
     : b.operator === '<' && a.operator === '<=' ? b
@@ -10438,11 +10653,11 @@ const lowerLT = (a, b, options) => {
 var subset_1 = subset;
 
 // just pre-load all the stuff that index.js lazily exports
-
+const internalRe = re$5.exports;
 var semver = {
-  re: re_1.re,
-  src: re_1.src,
-  tokens: re_1.t,
+  re: internalRe.re,
+  src: internalRe.src,
+  tokens: internalRe.t,
   SEMVER_SPEC_VERSION: constants.SEMVER_SPEC_VERSION,
   SemVer: semver$1,
   compareIdentifiers: identifiers.compareIdentifiers,
@@ -10515,20 +10730,20 @@ var retryDelays = [1, 1, 1, 2, 3, 4, 5, 10, 20, 40, 60].map(function (a) { retur
 var timeout = 6 * 60 * 60 * 1000;
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var startTime, context, payload, token, allowedActors, allowedUpdateTypes, approve, packageBlockList, merge, mergeMethod, pr, Octokit, octokit, readPackageJson, mergeWhenPossible, getPR, compareCommits, approvePR, validVersionChange, comparison, onlyPackageJsonChanged, packageJsonBase, packageJsonPr, diff, allowedPropsChanges, allowedChange, result;
+        var startTime, context$1, payload, token, allowedActors, allowedUpdateTypes, approve, packageBlockList, packageAllowListRaw, packageAllowList, merge, mergeMethod, pr, Octokit, octokit, readPackageJson, mergeWhenPossible, getPR, compareCommits, approvePR, validVersionChange, comparison, onlyPackageJsonChanged, packageJsonBase, packageJsonPr, diff, allowedPropsChanges, allowedChange, result;
         var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     startTime = Date.now();
                     core.info('Starting');
-                    context = github.context;
-                    core.debug(JSON.stringify(context, null, 2));
-                    if (!['pull_request', 'pull_request_target', 'pull_request_review'].includes(github.context.eventName)) {
-                        core.error("Unsupported event name: " + github.context.eventName);
+                    context$1 = context;
+                    core.debug(JSON.stringify(context$1, null, 2));
+                    if (!['pull_request', 'pull_request_target', 'pull_request_review'].includes(context.eventName)) {
+                        core.error("Unsupported event name: " + context.eventName);
                         return [2 /*return*/, Result.UnknownEvent];
                     }
-                    payload = github.context.payload;
+                    payload = context.payload;
                     token = core.getInput('repo-token', { required: true });
                     allowedActors = core.getInput('allowed-actors', { required: true })
                         .split(',')
@@ -10557,15 +10772,19 @@ function run() {
                     packageBlockList = (core.getInput('package-block-list') || '')
                         .split(',')
                         .map(function (a) { return a.trim(); });
-                    if (!allowedActors.includes(context.actor)) {
-                        core.error("Actor not allowed: " + context.actor);
+                    packageAllowListRaw = core.getInput('package-allow-list');
+                    packageAllowList = packageAllowListRaw
+                        ? packageAllowListRaw.split(',').map(function (a) { return a.trim(); })
+                        : null;
+                    if (!allowedActors.includes(context$1.actor)) {
+                        core.error("Actor not allowed: " + context$1.actor);
                         return [2 /*return*/, Result.ActorNotAllowed];
                     }
                     merge = core.getInput('merge') === 'true';
                     mergeMethod = toMergeMethod(core.getInput('merge-method', { required: true }));
                     pr = payload.pull_request;
-                    Octokit = utils$1.GitHub.plugin(throttling);
-                    octokit = new Octokit(utils$1.getOctokitOptions(token, {
+                    Octokit = GitHub.plugin(throttling);
+                    octokit = new Octokit(getOctokitOptions_1(token, {
                         throttle: {
                             onRateLimit: /* istanbul ignore next */ function (retryAfter) {
                                 core.warning("Hit rate limit. Retrying in " + retryAfter + " seconds");
@@ -10582,8 +10801,8 @@ function run() {
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0: return [4 /*yield*/, octokit.repos.getContent({
-                                        owner: context.repo.owner,
-                                        repo: context.repo.repo,
+                                        owner: context$1.repo.owner,
+                                        repo: context$1.repo.repo,
                                         path: 'package.json',
                                         ref: ref,
                                     })];
@@ -10622,8 +10841,8 @@ function run() {
                                                     _b.trys.push([2, 4, , 5]);
                                                     core.info('Attempting merge');
                                                     return [4 /*yield*/, octokit.pulls.merge({
-                                                            owner: context.repo.owner,
-                                                            repo: context.repo.repo,
+                                                            owner: context$1.repo.owner,
+                                                            repo: context$1.repo.repo,
                                                             pull_number: pr.number,
                                                             merge_method: mergeMethod,
                                                             sha: pr.head.sha,
@@ -10678,15 +10897,15 @@ function run() {
                     }); };
                     getPR = function () {
                         return octokit.pulls.get({
-                            owner: context.repo.owner,
-                            repo: context.repo.repo,
+                            owner: context$1.repo.owner,
+                            repo: context$1.repo.repo,
                             pull_number: pr.number,
                         });
                     };
                     compareCommits = function () {
                         return octokit.repos.compareCommits({
-                            owner: context.repo.owner,
-                            repo: context.repo.repo,
+                            owner: context$1.repo.owner,
+                            repo: context$1.repo.repo,
                             base: pr.base.sha,
                             head: pr.head.sha,
                         });
@@ -10696,16 +10915,16 @@ function run() {
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0: return [4 /*yield*/, octokit.pulls.createReview({
-                                        owner: context.repo.owner,
-                                        repo: context.repo.repo,
+                                        owner: context$1.repo.owner,
+                                        repo: context$1.repo.repo,
                                         pull_number: pr.number,
                                         commit_id: pr.head.sha,
                                     })];
                                 case 1:
                                     review = _a.sent();
                                     return [4 /*yield*/, octokit.pulls.submitReview({
-                                            owner: context.repo.owner,
-                                            repo: context.repo.repo,
+                                            owner: context$1.repo.owner,
+                                            repo: context$1.repo.repo,
                                             pull_number: pr.number,
                                             review_id: review.data.id,
                                             event: 'APPROVE',
@@ -10789,6 +11008,9 @@ function run() {
                         var changedDependencies = diff.updated[prop];
                         return Object.keys(changedDependencies).every(function (dependency) {
                             if (typeof changedDependencies[dependency] !== 'string') {
+                                return false;
+                            }
+                            if (packageAllowList && !packageAllowList.includes(dependency)) {
                                 return false;
                             }
                             if (packageBlockList.includes(dependency)) {
