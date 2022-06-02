@@ -39,7 +39,7 @@
     "jest-when": "^3.0.1",
     "prettier": "^2.1.1",
     "rollup": "^2.26.9",
-    "rollup-plugin-typescript2": "^0.31.0",
+    "rollup-plugin-typescript2": "^0.32.0",
     "semver": "^7.3.2",
     "ts-jest": "^26.4.1",
     "tslib": "^2.0.1",
