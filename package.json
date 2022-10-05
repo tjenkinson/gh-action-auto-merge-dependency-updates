@@ -31,7 +31,7 @@
     "@rollup/plugin-commonjs": "^19.0.0",
     "@rollup/plugin-node-resolve": "^13.0.0",
     "@types/jest": "^26.0.15",
-    "@types/jest-when": "^2.7.2",
+    "@types/jest-when": "^3.5.2",
     "@types/semver": "^7.3.3",
     "deep-object-diff": "^1.1.0",
     "husky": "^4.2.5",
