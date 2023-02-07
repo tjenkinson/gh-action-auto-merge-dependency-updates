@@ -36,6 +36,9 @@ on:
 jobs:
   run:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: tjenkinson/gh-action-auto-merge-dependency-updates@v1
         with:
