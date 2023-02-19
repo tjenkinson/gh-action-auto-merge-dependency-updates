@@ -4,14 +4,12 @@
   "private": true,
   "description": "A GitHub action that will automatically merge a PR that only contains dependency updates, based on some rules.",
   "scripts": {
+    "prepare": "husky install",
     "build": "rm -rf dist && rollup --config rollup.config.mjs",
     "watch": "rollup --config rollup.config.mjs --watch",
     "prettier": "prettier --write .",
     "lint": "prettier --check .",
     "test": "jest --coverage"
-  },
-  "hooks": {
-    "pre-commit": "npm run prettier"
   },
   "repository": {
     "type": "git",
