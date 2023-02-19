@@ -111,13 +111,19 @@ export async function run(): Promise<Result> {
   );
 
   const readPackageJson = async (ref: string): Promise<Record<string, any>> => {
-    const content = await octokit.repos.getContent({
+    const content = await octokit.rest.repos.getContent({
       owner: context.repo.owner,
       repo: context.repo.repo,
       path: 'package.json',
       ref,
     });
-    if (content.data.type !== 'file' || content.data.encoding !== 'base64') {
+
+    if (
+      !('type' in content.data) ||
+      content.data.type !== 'file' ||
+      !('encoding' in content.data) ||
+      content.data.encoding !== 'base64'
+    ) {
       throw new Error('Unexpected repo content response');
     }
     return JSON.parse(
@@ -140,7 +146,7 @@ export async function run(): Promise<Result> {
       if (mergeable) {
         try {
           core.info('Attempting merge');
-          await octokit.pulls.merge({
+          await octokit.rest.pulls.merge({
             owner: context.repo.owner,
             repo: context.repo.repo,
             pull_number: pr.number,
@@ -150,7 +156,7 @@ export async function run(): Promise<Result> {
           core.info('Merged');
           return Result.PRMerged;
         } catch (e) {
-          if (e.status && e.status === 409) {
+          if (e && typeof e === 'object' && 'status' in e && e.status === 409) {
             core.error('Failed to merge. PR head changed');
             return Result.PRHeadChanged;
           }
@@ -173,14 +179,14 @@ export async function run(): Promise<Result> {
   };
 
   const getPR = () =>
-    octokit.pulls.get({
+    octokit.rest.pulls.get({
       owner: context.repo.owner,
       repo: context.repo.repo,
       pull_number: pr.number,
     });
 
   const compareCommits = () =>
-    octokit.repos.compareCommits({
+    octokit.rest.repos.compareCommits({
       owner: context.repo.owner,
       repo: context.repo.repo,
       base: pr.base.sha,
@@ -188,13 +194,13 @@ export async function run(): Promise<Result> {
     });
 
   const approvePR = async () => {
-    const review = await octokit.pulls.createReview({
+    const review = await octokit.rest.pulls.createReview({
       owner: context.repo.owner,
       repo: context.repo.repo,
       pull_number: pr.number,
       commit_id: pr.head.sha,
     });
-    await octokit.pulls.submitReview({
+    await octokit.rest.pulls.submitReview({
       owner: context.repo.owner,
       repo: context.repo.repo,
       pull_number: pr.number,
@@ -245,6 +251,9 @@ export async function run(): Promise<Result> {
   core.info('Getting PR files');
   const comparison = await compareCommits();
   core.debug(JSON.stringify(comparison, null, 2));
+  if (!comparison.data.files) {
+    throw new Error('Unexpected error. `files` missing in commit comparison');
+  }
   const onlyPackageJsonChanged = comparison.data.files.every(
     ({ filename, status }) =>
       ['package.json', 'package-lock.json', 'yarn.lock'].includes(filename) &&
