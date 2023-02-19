@@ -15,6 +15,9 @@ var Url = require('url');
 var require$$0$3 = require('punycode');
 var zlib = require('zlib');
 
+// TODO hack. need to get the build working properly
+var crypto = require('crypto');
+
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 function getAugmentedNamespace(n) {
