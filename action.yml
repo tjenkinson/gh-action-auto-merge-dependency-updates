@@ -30,7 +30,7 @@ outputs:
   success:
     description: '"true" if the commit meets the criteria'
 runs:
-  using: 'node16'
+  using: 'node12'
   main: 'dist/index.js'
 branding:
   icon: 'git-merge'
