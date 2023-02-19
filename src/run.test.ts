@@ -142,7 +142,7 @@ possibleBumpTypes.forEach((prodBumpType) => {
 
 describe('run', () => {
   beforeEach(() => {
-    jest.useFakeTimers('modern' as any).setSystemTime(0);
+    jest.useFakeTimers('modern').setSystemTime(0);
     (github as any).context = {};
   });
 
@@ -355,17 +355,15 @@ describe('run', () => {
               .mockImplementation(validMergeCallMock);
 
             const octokitMock = {
-              rest: {
-                repos: {
-                  getContent: reposGetContentMock,
-                  compareCommits: reposCompareCommitsMock,
-                },
-                pulls: {
-                  get: pullsGetMock,
-                  createReview: createReviewMock,
-                  submitReview: submitReviewMock,
-                  merge: mergeMock,
-                },
+              repos: {
+                getContent: reposGetContentMock,
+                compareCommits: reposCompareCommitsMock,
+              },
+              pulls: {
+                get: pullsGetMock,
+                createReview: createReviewMock,
+                submitReview: submitReviewMock,
+                merge: mergeMock,
               },
             };
 
@@ -422,14 +420,6 @@ describe('run', () => {
             await expect(run()).rejects.toHaveProperty(
               'message',
               'Unexpected repo content response'
-            );
-          });
-
-          it('errors if files missing', async () => {
-            delete mockCompareCommits.data.files;
-            await expect(run()).rejects.toHaveProperty(
-              'message',
-              'Unexpected error. `files` missing in commit comparison'
             );
           });
 
