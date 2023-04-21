@@ -78,12 +78,11 @@ const versionChanges: VersionChange[] = [
     after: { dev: { mod1: '0.0.1' } },
     minRequired: { dev: 'patch', prod: 'none' },
   },
-  // TODO needs bug fix in https://github.com/npm/node-semver/pull/546
-  // {
-  //   before: { dev: { mod1: '0.0.1-alpha' } },
-  //   after: { dev: { mod1: '0.0.2' } },
-  //   minRequired: { dev: 'patch', prod: 'none' },
-  // },
+  {
+    before: { dev: { mod1: '0.0.1-alpha' } },
+    after: { dev: { mod1: '0.0.2' } },
+    minRequired: { dev: 'patch', prod: 'none' },
+  },
   {
     before: { dev: { mod1: '!0.0.1' } },
     after: { dev: { mod1: '0.0.2' } },
