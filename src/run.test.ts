@@ -247,6 +247,7 @@ describe('run', () => {
                   { filename: 'package.json', status: 'modified' },
                   { filename: 'package-lock.json', status: 'modified' },
                   { filename: 'yarn.lock', status: 'modified' },
+                  { filename: '.pnp.cjs', status: 'modified' },
                 ],
               },
             };
