@@ -256,8 +256,9 @@ export async function run(): Promise<Result> {
   }
   const onlyPackageJsonChanged = comparison.data.files.every(
     ({ filename, status }) =>
-      ['package.json', 'package-lock.json', 'yarn.lock'].includes(filename) &&
-      status === 'modified'
+      ['package.json', 'package-lock.json', 'yarn.lock', '.pnp.cjs'].includes(
+        filename
+      ) && status === 'modified'
   );
   if (!onlyPackageJsonChanged) {
     core.error('More changed than the package.json and lockfile');
