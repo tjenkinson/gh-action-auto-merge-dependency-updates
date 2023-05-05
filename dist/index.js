@@ -4357,7 +4357,7 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 
 var BottleneckLight = _interopDefault(__nccwpck_require__(1174));
 
-const VERSION = "5.0.1";
+const VERSION = "5.1.1";
 
 const noop = () => Promise.resolve();
 // @ts-expect-error
@@ -15224,8 +15224,7 @@ function run() {
                     }
                     onlyPackageJsonChanged = comparison.data.files.every(function (_a) {
                         var filename = _a.filename, status = _a.status;
-                        return ['package.json', 'package-lock.json', 'yarn.lock'].includes(filename) &&
-                            status === 'modified';
+                        return ['package.json', 'package-lock.json', 'yarn.lock', '.pnp.cjs'].includes(filename) && status === 'modified';
                     });
                     if (!onlyPackageJsonChanged) {
                         core.error('More changed than the package.json and lockfile');
