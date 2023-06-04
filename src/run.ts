@@ -22,6 +22,15 @@ const toMergeMethod = (method: string): MergeMethod => {
 const semverRegex = /^([~^]?)[0-9]+\.[0-9]+\.[0-9]+(-.+)?$/;
 const retryDelays = [1, 1, 1, 2, 3, 4, 5, 10, 20, 40, 60].map((a) => a * 1000);
 const timeout = 6 * 60 * 60 * 1000;
+const validBumpTypes = [
+  'major',
+  'premajor',
+  'minor',
+  'preminor',
+  'patch',
+  'prepatch',
+  'prerelease',
+];
 
 export async function run(): Promise<Result> {
   const startTime = Date.now();
@@ -235,16 +244,9 @@ export async function run(): Promise<Result> {
       return false;
     }
 
-    const allowed: Array<string | null> = [];
-    if (allowedBumpTypes.includes('major')) {
-      allowed.push('major');
-    }
-    if (allowedBumpTypes.includes('minor')) {
-      allowed.push('minor');
-    }
-    if (allowedBumpTypes.includes('patch')) {
-      allowed.push('patch');
-    }
+    const allowed: Array<string | null> = allowedBumpTypes.filter((type) =>
+      validBumpTypes.includes(type)
+    );
     return allowed.includes(semver.diff(oldVersionExact, newVersionExact));
   };
 
