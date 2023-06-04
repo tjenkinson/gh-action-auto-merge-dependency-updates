@@ -4357,7 +4357,7 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 
 var BottleneckLight = _interopDefault(__nccwpck_require__(1174));
 
-const VERSION = "5.1.1";
+const VERSION = "5.2.2";
 
 const noop = () => Promise.resolve();
 // @ts-expect-error
@@ -9254,7 +9254,7 @@ class SemVer {
         version = version.version
       }
     } else if (typeof version !== 'string') {
-      throw new TypeError(`Invalid Version: ${(__nccwpck_require__(3837).inspect)(version)}`)
+      throw new TypeError(`Invalid version. Must be a string. Got type "${typeof version}".`)
     }
 
     if (version.length > MAX_LENGTH) {
@@ -14973,6 +14973,15 @@ var toMergeMethod = function (method) {
 var semverRegex = /^([~^]?)[0-9]+\.[0-9]+\.[0-9]+(-.+)?$/;
 var retryDelays = [1, 1, 1, 2, 3, 4, 5, 10, 20, 40, 60].map(function (a) { return a * 1000; });
 var timeout = 6 * 60 * 60 * 1000;
+var validBumpTypes = [
+    'major',
+    'premajor',
+    'minor',
+    'preminor',
+    'patch',
+    'prepatch',
+    'prerelease',
+];
 function run() {
     return __awaiter(this, void 0, void 0, function () {
         var startTime, context, payload, token, allowedActors, allowedUpdateTypes, approve, packageBlockList, packageAllowListRaw, packageAllowList, merge, mergeMethod, pr, Octokit, octokit, readPackageJson, mergeWhenPossible, getPR, compareCommits, approvePR, validVersionChange, comparison, onlyPackageJsonChanged, packageJsonBase, packageJsonPr, diff, allowedPropsChanges, allowedChange, result;
@@ -15202,16 +15211,9 @@ function run() {
                         if (semver_default().gte(oldVersionExact, newVersionExact)) {
                             return false;
                         }
-                        var allowed = [];
-                        if (allowedBumpTypes.includes('major')) {
-                            allowed.push('major');
-                        }
-                        if (allowedBumpTypes.includes('minor')) {
-                            allowed.push('minor');
-                        }
-                        if (allowedBumpTypes.includes('patch')) {
-                            allowed.push('patch');
-                        }
+                        var allowed = allowedBumpTypes.filter(function (type) {
+                            return validBumpTypes.includes(type);
+                        });
                         return allowed.includes(semver_default().diff(oldVersionExact, newVersionExact));
                     };
                     core.info('Getting PR files');
