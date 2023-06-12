@@ -256,14 +256,14 @@ export async function run(): Promise<Result> {
   if (!comparison.data.files) {
     throw new Error('Unexpected error. `files` missing in commit comparison');
   }
-  const onlyPackageJsonChanged = comparison.data.files.every(
+  const onlyAllowedFilesChanged = comparison.data.files.every(
     ({ filename, status }) =>
       ['package.json', 'package-lock.json', 'yarn.lock', '.pnp.cjs'].includes(
         filename
       ) && status === 'modified'
   );
-  if (!onlyPackageJsonChanged) {
-    core.error('More changed than the package.json and lockfile');
+  if (!onlyAllowedFilesChanged) {
+    core.error('More changed than the package.json, lockfile, and .pnp.cjs');
     return Result.FileNotAllowed;
   }
 
