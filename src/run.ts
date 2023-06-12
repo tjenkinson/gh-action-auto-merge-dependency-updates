@@ -31,6 +31,12 @@ const validBumpTypes = [
   'prepatch',
   'prerelease',
 ];
+const allowedFileChanges = [
+  'package.json',
+  'package-lock.json',
+  'yarn.lock',
+  '.pnp.cjs',
+];
 
 export async function run(): Promise<Result> {
   const startTime = Date.now();
@@ -258,12 +264,12 @@ export async function run(): Promise<Result> {
   }
   const onlyAllowedFilesChanged = comparison.data.files.every(
     ({ filename, status }) =>
-      ['package.json', 'package-lock.json', 'yarn.lock', '.pnp.cjs'].includes(
-        filename
-      ) && status === 'modified'
+      allowedFileChanges.includes(filename) && status === 'modified'
   );
   if (!onlyAllowedFilesChanged) {
-    core.error('More changed than the package.json, lockfile, and .pnp.cjs');
+    core.error(
+      `More changed than ${allowedFileChanges.map((a) => `"${a}"`).join(', ')}`
+    );
     return Result.FileNotAllowed;
   }
 
