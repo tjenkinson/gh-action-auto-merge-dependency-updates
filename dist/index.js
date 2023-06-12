@@ -14984,7 +14984,7 @@ var validBumpTypes = [
 ];
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var startTime, context, payload, token, allowedActors, allowedUpdateTypes, approve, packageBlockList, packageAllowListRaw, packageAllowList, merge, mergeMethod, pr, Octokit, octokit, readPackageJson, mergeWhenPossible, getPR, compareCommits, approvePR, validVersionChange, comparison, onlyPackageJsonChanged, packageJsonBase, packageJsonPr, diff, allowedPropsChanges, allowedChange, result;
+        var startTime, context, payload, token, allowedActors, allowedUpdateTypes, approve, packageBlockList, packageAllowListRaw, packageAllowList, merge, mergeMethod, pr, Octokit, octokit, readPackageJson, mergeWhenPossible, getPR, compareCommits, approvePR, validVersionChange, comparison, onlyAllowedFilesChanged, packageJsonBase, packageJsonPr, diff, allowedPropsChanges, allowedChange, result;
         var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -15224,12 +15224,12 @@ function run() {
                     if (!comparison.data.files) {
                         throw new Error('Unexpected error. `files` missing in commit comparison');
                     }
-                    onlyPackageJsonChanged = comparison.data.files.every(function (_a) {
+                    onlyAllowedFilesChanged = comparison.data.files.every(function (_a) {
                         var filename = _a.filename, status = _a.status;
                         return ['package.json', 'package-lock.json', 'yarn.lock', '.pnp.cjs'].includes(filename) && status === 'modified';
                     });
-                    if (!onlyPackageJsonChanged) {
-                        core.error('More changed than the package.json and lockfile');
+                    if (!onlyAllowedFilesChanged) {
+                        core.error('More changed than the package.json, lockfile, and .pnp.cjs');
                         return [2 /*return*/, Result.FileNotAllowed];
                     }
                     core.info('Retrieving package.json');
