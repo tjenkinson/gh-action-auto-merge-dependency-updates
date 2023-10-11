@@ -209,6 +209,33 @@ export async function run(): Promise<Result> {
     });
 
   const approvePR = async () => {
+    const authenticatedUser = (await octokit.rest.users.getAuthenticated())
+      .data;
+
+    core.debug(`Authenticated user: ${authenticatedUser.id}`);
+
+    const existingReviews = await octokit.rest.pulls.listReviews({
+      owner: context.repo.owner,
+      repo: context.repo.repo,
+      pull_number: pr.number,
+    });
+    const existingReview = existingReviews.data.find(
+      /* istanbul ignore next */
+      ({ user, state }) =>
+        user?.id === authenticatedUser.id && state === 'PENDING'
+    );
+
+    /* istanbul ignore next */
+    if (existingReview) {
+      core.info(`Found an existing pending review. Deleting it`);
+      await octokit.rest.pulls.deletePendingReview({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        pull_number: pr.number,
+        review_id: existingReview.id,
+      });
+    }
+
     const review = await octokit.rest.pulls.createReview({
       owner: context.repo.owner,
       repo: context.repo.repo,

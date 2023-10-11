@@ -318,6 +318,21 @@ describe('run', () => {
               })
               .mockImplementation(() => mockCompareCommits);
 
+            const mockUserId = 'mockUserId';
+            const getAuthenticatedMock = jest.fn();
+            when(getAuthenticatedMock)
+              .expectCalledWith()
+              .mockReturnValue(Promise.resolve({ data: { id: mockUserId } }));
+
+            const listReviewsMock = jest.fn();
+            when(listReviewsMock)
+              .expectCalledWith({
+                owner: github.context.repo.owner,
+                repo: github.context.repo.repo,
+                pull_number: github.context.payload.pull_request!.number,
+              })
+              .mockReturnValue(Promise.resolve({ data: [] }));
+
             const mockReviewId = 'mockReviewId';
             const createReviewMock = jest.fn();
             when(createReviewMock)
@@ -357,12 +372,16 @@ describe('run', () => {
 
             const octokitMock = {
               rest: {
+                users: {
+                  getAuthenticated: getAuthenticatedMock,
+                },
                 repos: {
                   getContent: reposGetContentMock,
                   compareCommits: reposCompareCommitsMock,
                 },
                 pulls: {
                   get: pullsGetMock,
+                  listReviews: listReviewsMock,
                   createReview: createReviewMock,
                   submitReview: submitReviewMock,
                   merge: mergeMock,
