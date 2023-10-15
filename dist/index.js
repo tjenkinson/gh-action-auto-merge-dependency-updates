@@ -15236,37 +15236,40 @@ function run() {
                         });
                     };
                     approvePR = function () { return __awaiter(_this, void 0, void 0, function () {
-                        var authenticatedUser, existingReviews, e_2, existingReview, review;
+                        var maybeAuthenticatedUser, e_2, authenticatedUser_1, existingReviews, existingReview, review;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
-                                case 0: return [4 /*yield*/, octokit.rest.users.getAuthenticated()];
+                                case 0:
+                                    maybeAuthenticatedUser = null;
+                                    _a.label = 1;
                                 case 1:
-                                    authenticatedUser = (_a.sent())
-                                        .data;
-                                    core.debug("Authenticated user: ".concat(authenticatedUser.id));
-                                    existingReviews = [];
-                                    _a.label = 2;
+                                    _a.trys.push([1, 3, , 4]);
+                                    return [4 /*yield*/, octokit.rest.users.getAuthenticated()];
                                 case 2:
-                                    _a.trys.push([2, 4, , 5]);
+                                    maybeAuthenticatedUser = (_a.sent())
+                                        .data;
+                                    return [3 /*break*/, 4];
+                                case 3:
+                                    e_2 = _a.sent();
+                                    core.warning('Error fetching authenticated user');
+                                    if (core.isDebug() && (e_2 instanceof Error || typeof e_2 === 'string')) {
+                                        core.warning(e_2);
+                                    }
+                                    return [3 /*break*/, 4];
+                                case 4:
+                                    if (!maybeAuthenticatedUser) return [3 /*break*/, 7];
+                                    authenticatedUser_1 = maybeAuthenticatedUser;
+                                    core.debug("Authenticated user: ".concat(authenticatedUser_1.id));
                                     return [4 /*yield*/, octokit.rest.pulls.listReviews({
                                             owner: context.repo.owner,
                                             repo: context.repo.repo,
                                             pull_number: pr.number,
                                         })];
-                                case 3:
-                                    existingReviews = (_a.sent()).data;
-                                    return [3 /*break*/, 5];
-                                case 4:
-                                    e_2 = _a.sent();
-                                    core.warning('Error checking for existing reviews. Assuming none');
-                                    if (core.isDebug() && (e_2 instanceof Error || typeof e_2 === 'string')) {
-                                        core.warning(e_2);
-                                    }
-                                    return [3 /*break*/, 5];
                                 case 5:
+                                    existingReviews = (_a.sent()).data;
                                     existingReview = existingReviews.find(function (_a) {
                                         var user = _a.user, state = _a.state;
-                                        return (user === null || user === void 0 ? void 0 : user.id) === authenticatedUser.id && state === 'PENDING';
+                                        return (user === null || user === void 0 ? void 0 : user.id) === authenticatedUser_1.id && state === 'PENDING';
                                     });
                                     if (!existingReview) return [3 /*break*/, 7];
                                     core.info("Found an existing pending review. Deleting it");

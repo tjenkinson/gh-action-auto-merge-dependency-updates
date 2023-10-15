@@ -209,41 +209,48 @@ export async function run(): Promise<Result> {
     });
 
   const approvePR = async () => {
-    const authenticatedUser = (await octokit.rest.users.getAuthenticated())
-      .data;
+    let maybeAuthenticatedUser:
+      | Awaited<
+          ReturnType<(typeof octokit)['rest']['users']['getAuthenticated']>
+        >['data']
+      | null = null;
 
-    core.debug(`Authenticated user: ${authenticatedUser.id}`);
-
-    let existingReviews: Awaited<
-      ReturnType<(typeof octokit)['rest']['pulls']['listReviews']>
-    >['data'] = [];
     try {
-      existingReviews = (
+      maybeAuthenticatedUser = (await octokit.rest.users.getAuthenticated())
+        .data;
+    } catch (e) {
+      core.warning('Error fetching authenticated user');
+      if (core.isDebug() && (e instanceof Error || typeof e === 'string')) {
+        core.warning(e);
+      }
+    }
+
+    if (maybeAuthenticatedUser) {
+      const authenticatedUser = maybeAuthenticatedUser;
+      core.debug(`Authenticated user: ${authenticatedUser.id}`);
+
+      const existingReviews = (
         await octokit.rest.pulls.listReviews({
           owner: context.repo.owner,
           repo: context.repo.repo,
           pull_number: pr.number,
         })
       ).data;
-    } catch (e) {
-      core.warning('Error checking for existing reviews. Assuming none');
-      if (core.isDebug() && (e instanceof Error || typeof e === 'string')) {
-        core.warning(e);
-      }
-    }
-    const existingReview = existingReviews.find(
-      ({ user, state }) =>
-        user?.id === authenticatedUser.id && state === 'PENDING'
-    );
 
-    if (existingReview) {
-      core.info(`Found an existing pending review. Deleting it`);
-      await octokit.rest.pulls.deletePendingReview({
-        owner: context.repo.owner,
-        repo: context.repo.repo,
-        pull_number: pr.number,
-        review_id: existingReview.id,
-      });
+      const existingReview = existingReviews.find(
+        ({ user, state }) =>
+          user?.id === authenticatedUser.id && state === 'PENDING'
+      );
+
+      if (existingReview) {
+        core.info(`Found an existing pending review. Deleting it`);
+        await octokit.rest.pulls.deletePendingReview({
+          owner: context.repo.owner,
+          repo: context.repo.repo,
+          pull_number: pr.number,
+          review_id: existingReview.id,
+        });
+      }
     }
 
     const review = await octokit.rest.pulls.createReview({
