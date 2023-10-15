@@ -15108,11 +15108,11 @@ function run() {
                     Octokit = utils.GitHub.plugin(dist_node/* throttling */.O);
                     octokit = new Octokit((0,utils.getOctokitOptions)(token, {
                         throttle: {
-                            onRateLimit: /* istanbul ignore next */ function (retryAfter) {
+                            onRateLimit: function (retryAfter) {
                                 core.warning("Hit rate limit. Retrying in ".concat(retryAfter, " seconds"));
                                 return true;
                             },
-                            onAbuseLimit: /* istanbul ignore next */ function (retryAfter) {
+                            onAbuseLimit: function (retryAfter) {
                                 core.warning("Hit abuse limit. Retrying in ".concat(retryAfter, " seconds"));
                                 return true;
                             },
@@ -15236,7 +15236,7 @@ function run() {
                         });
                     };
                     approvePR = function () { return __awaiter(_this, void 0, void 0, function () {
-                        var authenticatedUser, existingReviews, existingReview, review;
+                        var authenticatedUser, existingReviews, e_2, existingReview, review;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0: return [4 /*yield*/, octokit.rest.users.getAuthenticated()];
@@ -15244,20 +15244,31 @@ function run() {
                                     authenticatedUser = (_a.sent())
                                         .data;
                                     core.debug("Authenticated user: ".concat(authenticatedUser.id));
+                                    existingReviews = [];
+                                    _a.label = 2;
+                                case 2:
+                                    _a.trys.push([2, 4, , 5]);
                                     return [4 /*yield*/, octokit.rest.pulls.listReviews({
                                             owner: context.repo.owner,
                                             repo: context.repo.repo,
                                             pull_number: pr.number,
                                         })];
-                                case 2:
-                                    existingReviews = _a.sent();
-                                    existingReview = existingReviews.data.find(
-                                    /* istanbul ignore next */
-                                    function (_a) {
+                                case 3:
+                                    existingReviews = (_a.sent()).data;
+                                    return [3 /*break*/, 5];
+                                case 4:
+                                    e_2 = _a.sent();
+                                    core.warning('Error checking for existing reviews. Assuming none');
+                                    if (core.isDebug() && (e_2 instanceof Error || typeof e_2 === 'string')) {
+                                        core.warning(e_2);
+                                    }
+                                    return [3 /*break*/, 5];
+                                case 5:
+                                    existingReview = existingReviews.find(function (_a) {
                                         var user = _a.user, state = _a.state;
                                         return (user === null || user === void 0 ? void 0 : user.id) === authenticatedUser.id && state === 'PENDING';
                                     });
-                                    if (!existingReview) return [3 /*break*/, 4];
+                                    if (!existingReview) return [3 /*break*/, 7];
                                     core.info("Found an existing pending review. Deleting it");
                                     return [4 /*yield*/, octokit.rest.pulls.deletePendingReview({
                                             owner: context.repo.owner,
@@ -15265,16 +15276,16 @@ function run() {
                                             pull_number: pr.number,
                                             review_id: existingReview.id,
                                         })];
-                                case 3:
+                                case 6:
                                     _a.sent();
-                                    _a.label = 4;
-                                case 4: return [4 /*yield*/, octokit.rest.pulls.createReview({
+                                    _a.label = 7;
+                                case 7: return [4 /*yield*/, octokit.rest.pulls.createReview({
                                         owner: context.repo.owner,
                                         repo: context.repo.repo,
                                         pull_number: pr.number,
                                         commit_id: pr.head.sha,
                                     })];
-                                case 5:
+                                case 8:
                                     review = _a.sent();
                                     return [4 /*yield*/, octokit.rest.pulls.submitReview({
                                             owner: context.repo.owner,
@@ -15283,7 +15294,7 @@ function run() {
                                             review_id: review.data.id,
                                             event: 'APPROVE',
                                         })];
-                                case 6:
+                                case 9:
                                     _a.sent();
                                     return [2 /*return*/];
                             }
