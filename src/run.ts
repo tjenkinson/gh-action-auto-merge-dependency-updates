@@ -113,11 +113,11 @@ export async function run(): Promise<Result> {
   const octokit = new Octokit(
     getOctokitOptions(token, {
       throttle: {
-        onRateLimit: /* istanbul ignore next */ (retryAfter: number) => {
+        onRateLimit: (retryAfter: number) => {
           core.warning(`Hit rate limit. Retrying in ${retryAfter} seconds`);
           return true;
         },
-        onAbuseLimit: /* istanbul ignore next */ (retryAfter: number) => {
+        onAbuseLimit: (retryAfter: number) => {
           core.warning(`Hit abuse limit. Retrying in ${retryAfter} seconds`);
           return true;
         },
@@ -214,18 +214,28 @@ export async function run(): Promise<Result> {
 
     core.debug(`Authenticated user: ${authenticatedUser.id}`);
 
-    const existingReviews = await octokit.rest.pulls.listReviews({
-      owner: context.repo.owner,
-      repo: context.repo.repo,
-      pull_number: pr.number,
-    });
-    const existingReview = existingReviews.data.find(
-      /* istanbul ignore next */
+    let existingReviews: Awaited<
+      ReturnType<(typeof octokit)['rest']['pulls']['listReviews']>
+    >['data'] = [];
+    try {
+      existingReviews = (
+        await octokit.rest.pulls.listReviews({
+          owner: context.repo.owner,
+          repo: context.repo.repo,
+          pull_number: pr.number,
+        })
+      ).data;
+    } catch (e) {
+      core.warning('Error checking for existing reviews. Assuming none');
+      if (core.isDebug() && (e instanceof Error || typeof e === 'string')) {
+        core.warning(e);
+      }
+    }
+    const existingReview = existingReviews.find(
       ({ user, state }) =>
         user?.id === authenticatedUser.id && state === 'PENDING'
     );
 
-    /* istanbul ignore next */
     if (existingReview) {
       core.info(`Found an existing pending review. Deleting it`);
       await octokit.rest.pulls.deletePendingReview({
