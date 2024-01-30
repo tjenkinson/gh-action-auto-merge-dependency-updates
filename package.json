@@ -29,7 +29,7 @@
     "@types/semver": "^7.3.13",
     "@vercel/ncc": "^0.38.0",
     "deep-object-diff": "^1.1.9",
-    "husky": "^8.0.3",
+    "husky": "^9.0.7",
     "prettier": "^2.8.4",
     "semver": "^7.5.0",
     "ts-jest": "^29.0.5",
