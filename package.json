@@ -25,7 +25,7 @@
     "@actions/github": "5.1.1",
     "@octokit/plugin-throttling": "^5.0.1",
     "@octokit/webhooks": "10.9.1",
-    "@types/node": "^18.14.0",
+    "@types/node": "^20.11.25",
     "@types/semver": "^7.3.13",
     "@vercel/ncc": "^0.38.0",
     "deep-object-diff": "^1.1.9",
