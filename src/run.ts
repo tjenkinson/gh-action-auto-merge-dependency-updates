@@ -47,7 +47,7 @@ export async function run(): Promise<Result> {
 
   if (
     !['pull_request', 'pull_request_target', 'pull_request_review'].includes(
-      github.context.eventName
+      github.context.eventName,
     )
   ) {
     core.error(`Unsupported event name: ${github.context.eventName}`);
@@ -104,12 +104,12 @@ export async function run(): Promise<Result> {
 
   const merge = core.getInput('merge') === 'true';
   const mergeMethod = toMergeMethod(
-    core.getInput('merge-method', { required: true })
+    core.getInput('merge-method', { required: true }),
   );
 
   const pr = payload.pull_request;
 
-  const Octokit = GitHub.plugin(throttling);
+  const Octokit: typeof GitHub = GitHub.plugin(throttling as any);
   const octokit = new Octokit(
     getOctokitOptions(token, {
       throttle: {
@@ -122,7 +122,7 @@ export async function run(): Promise<Result> {
           return true;
         },
       },
-    })
+    }),
   );
 
   const readPackageJson = async (ref: string): Promise<Record<string, any>> => {
@@ -142,7 +142,7 @@ export async function run(): Promise<Result> {
       throw new Error('Unexpected repo content response');
     }
     return JSON.parse(
-      Buffer.from(content.data.content, 'base64').toString('utf-8')
+      Buffer.from(content.data.content, 'base64').toString('utf-8'),
     );
   };
 
@@ -239,7 +239,7 @@ export async function run(): Promise<Result> {
 
       const existingReview = existingReviews.find(
         ({ user, state }) =>
-          user?.id === authenticatedUser.id && state === 'PENDING'
+          user?.id === authenticatedUser.id && state === 'PENDING',
       );
 
       if (existingReview) {
@@ -271,7 +271,7 @@ export async function run(): Promise<Result> {
   const validVersionChange = (
     oldVersion: string,
     newVersion: string,
-    allowedBumpTypes: string[]
+    allowedBumpTypes: string[],
   ): boolean => {
     const oldVersionMatches = semverRegex.exec(oldVersion);
     if (!oldVersionMatches) {
@@ -295,7 +295,7 @@ export async function run(): Promise<Result> {
     }
 
     const allowed: Array<string | null> = allowedBumpTypes.filter((type) =>
-      validBumpTypes.includes(type)
+      validBumpTypes.includes(type),
     );
     return allowed.includes(semver.diff(oldVersionExact, newVersionExact));
   };
@@ -308,11 +308,11 @@ export async function run(): Promise<Result> {
   }
   const onlyAllowedFilesChanged = comparison.data.files.every(
     ({ filename, status }) =>
-      allowedFileChanges.includes(filename) && status === 'modified'
+      allowedFileChanges.includes(filename) && status === 'modified',
   );
   if (!onlyAllowedFilesChanged) {
     core.error(
-      `More changed than ${allowedFileChanges.map((a) => `"${a}"`).join(', ')}`
+      `More changed than ${allowedFileChanges.map((a) => `"${a}"`).join(', ')}`,
     );
     return Result.FileNotAllowed;
   }
