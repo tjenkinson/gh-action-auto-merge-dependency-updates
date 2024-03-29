@@ -6,6 +6,7 @@ import { throttling } from '@octokit/plugin-throttling';
 import { detailedDiff } from 'deep-object-diff';
 import semver from 'semver';
 import { Result } from './result';
+import { graphql } from '@octokit/graphql';
 
 type MergeMethod = 'merge' | 'squash' | 'rebase';
 const mergeMethods: ReadonlyArray<MergeMethod> = ['merge', 'squash', 'rebase'];
@@ -97,6 +98,8 @@ export async function run(): Promise<Result> {
     ? packageAllowListRaw.split(',').map((a) => a.trim())
     : null;
 
+  const autoMerge = core.getInput('use-auto-merge') === 'true';
+
   if (!allowedActors.includes(context.actor)) {
     core.error(`Actor not allowed: ${context.actor}`);
     return Result.ActorNotAllowed;
@@ -126,6 +129,136 @@ export async function run(): Promise<Result> {
       },
     }),
   );
+
+  const graphqlWithAuth = graphql.defaults({
+    headers: {
+      authorization: `token ${token}`,
+    },
+  });
+
+  let maybeAuthenticatedUser:
+    | Awaited<
+        ReturnType<(typeof octokit)['rest']['users']['getAuthenticated']>
+      >['data']
+    | null = null;
+
+  try {
+    maybeAuthenticatedUser = (await octokit.rest.users.getAuthenticated()).data;
+    core.debug(`Authenticated user: ${maybeAuthenticatedUser.id}`);
+  } catch (e) {
+    core.warning('Error fetching authenticated user');
+    if (core.isDebug() && (e instanceof Error || typeof e === 'string')) {
+      core.warning(e);
+    }
+  }
+
+  const maybeDisableAutoMerge = async (): Promise<void> => {
+    if (!autoMerge) return;
+
+    core.debug('Checking if auto merge enabled');
+
+    const { node } = (await graphqlWithAuth(
+      `
+        query($id: ID!) {
+          node(id: $id) {
+            ... on PullRequest {
+              autoMergeRequest {
+                enabledBy {
+                  login
+                }
+              }
+            }
+          }
+        }
+      `,
+      { id: pr.node_id },
+    )) as any;
+
+    // auto merge not enabled
+    if (!node.autoMergeRequest) {
+      core.debug('Auto merge not enabled');
+      return;
+    }
+
+    const autoMergeEnabledBy = node.autoMergeRequest.enabledBy.login;
+    if (
+      autoMergeEnabledBy !==
+      (maybeAuthenticatedUser ? maybeAuthenticatedUser.login : 'github-actions')
+    ) {
+      // auto merge enabled by someone else so leave it
+      core.debug('Leaving auto merge enabled');
+      return;
+    }
+
+    core.info('Disabling auto merge');
+    await graphqlWithAuth(
+      `
+          mutation ($id: ID!) {
+            disablePullRequestAutoMerge(input: { pullRequestId: $id }) {
+              clientMutationId
+            }
+          }
+      `,
+      { id: pr.node_id },
+    );
+    core.info('Auto merge disabled');
+  };
+
+  const enableAutoMerge = async (): Promise<
+    Result.AutoMergeEnabled | Result.PRMerged
+  > => {
+    core.info('Enabling auto merge');
+    const { repository } = (await graphqlWithAuth(
+      `
+        query ($owner: String!, $name: String!) {
+          repository(owner: $owner, name: $name) {
+            autoMergeAllowed
+          }
+        }
+      `,
+      { owner: context.repo.owner, name: context.repo.repo },
+    )) as any;
+
+    if (!repository.autoMergeAllowed) {
+      throw new Error('Auto merge is not enabled on the repo');
+    }
+
+    try {
+      await graphqlWithAuth(
+        `
+          mutation ($id: ID!, $mergeMethod: PullRequestMergeMethod!, $expectedHeadOid: GitObjectID!) {
+            enablePullRequestAutoMerge(input: { pullRequestId: $id, mergeMethod: $mergeMethod, expectedHeadOid: $expectedHeadOid }) {
+              clientMutationId
+            }
+          }
+      `,
+        {
+          id: pr.node_id,
+          mergeMethod: mergeMethod.toUpperCase(),
+          expectedHeadOid: pr.head.sha,
+        },
+      );
+      core.info('Auto merge enabled');
+      return Result.AutoMergeEnabled;
+    } catch (e) {
+      // might be in a clean state
+      core.warning('Auto merge failed to enable');
+      if (core.isDebug() && (e instanceof Error || typeof e === 'string')) {
+        core.warning(e);
+      }
+
+      core.info('Trying to merge');
+      await octokit.rest.pulls.merge({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        pull_number: pr.number,
+        merge_method: mergeMethod,
+        sha: pr.head.sha,
+      });
+      core.info('Merged');
+      return Result.PRMerged;
+    }
+  };
 
   const readPackageJson = async (ref: string): Promise<Record<string, any>> => {
     const content = await octokit.rest.repos.getContent({
@@ -211,25 +344,8 @@ export async function run(): Promise<Result> {
     });
 
   const approvePR = async () => {
-    let maybeAuthenticatedUser:
-      | Awaited<
-          ReturnType<(typeof octokit)['rest']['users']['getAuthenticated']>
-        >['data']
-      | null = null;
-
-    try {
-      maybeAuthenticatedUser = (await octokit.rest.users.getAuthenticated())
-        .data;
-    } catch (e) {
-      core.warning('Error fetching authenticated user');
-      if (core.isDebug() && (e instanceof Error || typeof e === 'string')) {
-        core.warning(e);
-      }
-    }
-
     if (maybeAuthenticatedUser) {
       const authenticatedUser = maybeAuthenticatedUser;
-      core.debug(`Authenticated user: ${authenticatedUser.id}`);
 
       const existingReviews = (
         await octokit.rest.pulls.listReviews({
@@ -316,6 +432,7 @@ export async function run(): Promise<Result> {
     core.error(
       `More changed than ${allowedFileChanges.map((a) => `"${a}"`).join(', ')}`,
     );
+    await maybeDisableAutoMerge();
     return Result.FileNotAllowed;
   }
 
@@ -328,6 +445,7 @@ export async function run(): Promise<Result> {
   core.debug(JSON.stringify(diff, null, 2));
   if (Object.keys(diff.added).length || Object.keys(diff.deleted).length) {
     core.error('Unexpected changes');
+    await maybeDisableAutoMerge();
     return Result.UnexpectedChanges;
   }
 
@@ -341,6 +459,7 @@ export async function run(): Promise<Result> {
   });
   if (!allowedPropsChanges) {
     core.error('Unexpected property change');
+    await maybeDisableAutoMerge();
     return Result.UnexpectedPropertyChange;
   }
 
@@ -368,6 +487,7 @@ export async function run(): Promise<Result> {
 
   if (!allowedChange) {
     core.error('One or more version changes are not allowed');
+    await maybeDisableAutoMerge();
     return Result.VersionChangeNotAllowed;
   }
 
@@ -380,8 +500,12 @@ export async function run(): Promise<Result> {
 
   let result = Result.PRMergeSkipped;
   if (merge) {
-    core.info('Merging when possible');
-    result = await mergeWhenPossible();
+    if (autoMerge) {
+      result = await enableAutoMerge();
+    } else {
+      core.info('Merging when possible');
+      result = await mergeWhenPossible();
+    }
   }
   core.info('Finished!');
   return result;

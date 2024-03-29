@@ -14,6 +14,9 @@ inputs:
   approve:
     description: 'Automatically approve the PR if it qualifies for auto merge'
     default: 'true'
+  use-auto-merge:
+    description: 'Enable GitHub auto merge on the PR and exit instead of waiting for the checks to complete and merging. Auto merge must be enabled on the repo, and you should make sure this is a required status check'
+    default: 'false'
   merge:
     description: 'Merge the PR if it qualifies'
     default: 'true'
