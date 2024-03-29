@@ -117,8 +117,10 @@ export async function run(): Promise<Result> {
           core.warning(`Hit rate limit. Retrying in ${retryAfter} seconds`);
           return true;
         },
-        onAbuseLimit: (retryAfter: number) => {
-          core.warning(`Hit abuse limit. Retrying in ${retryAfter} seconds`);
+        onSecondaryRateLimit: (retryAfter: number) => {
+          core.warning(
+            `Hit secondary rate limit. Retrying in ${retryAfter} seconds`,
+          );
           return true;
         },
       },
