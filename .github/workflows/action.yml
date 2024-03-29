@@ -11,6 +11,6 @@ jobs:
       - uses: actions/checkout@v3
       - uses: ./
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          use-auto-merge: true
           allowed-actors: tjenkinson, dependabot[bot]
           package-block-list: '@actions/core, @actions/github'
