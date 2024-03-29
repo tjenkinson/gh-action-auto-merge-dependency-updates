@@ -8,8 +8,16 @@ Note that the action does not check the lockfile is valid, so you should only se
 
 It currently supports npm and yarn.
 
+By default this action will poll the API and wait for all status checks to pass which is not very efficient. It's recommended that you:
+
+- Enable auto merge on your repo
+- Enable the `use-auto-merge` option in the action
+- Configure this action as a required status check
+  - This is so that if a PR is updated and auto merge needs disabling, the PR cannot auto merge before that happens
+
 ## Config
 
+- `use-auto-merge`: **\[Recommended\]** Enable GitHub auto merge on the PR and exit instead of waiting for the checks to complete and merging. Auto merge must be enabled on the repo, and you should make sure this is a required status check. _Default: `false`_
 - `allowed-actors`: A comma separated list of usernames auto merge is allowed for.
 - `repo-token` (optional): a GitHub API token. _Default: The token provided to the workflow (`${{ github.token }}`)_
 - `allowed-update-types` (optional): A comma separated list of types of updates that are allowed. Supported: [devDependencies|dependencies]:[major|minor|patch|premajor|preminor|prerelease]. _Default: `devDependencies:minor, devDependencies:patch`_
@@ -34,7 +42,7 @@ on:
   - pull_request_target
 
 jobs:
-  run:
+  auto-merge-dependency-updates:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -42,5 +50,6 @@ jobs:
     steps:
       - uses: tjenkinson/gh-action-auto-merge-dependency-updates@v1
         with:
+          use-auto-merge: true
           allowed-actors: dependabot-preview[bot], dependabot[bot]
 ```
