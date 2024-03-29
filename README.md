@@ -51,5 +51,5 @@ jobs:
       - uses: tjenkinson/gh-action-auto-merge-dependency-updates@v1
         with:
           use-auto-merge: true
-          allowed-actors: dependabot-preview[bot], dependabot[bot]
+          allowed-actors: dependabot[bot]
 ```
