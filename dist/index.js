@@ -37262,7 +37262,9 @@ function run() {
                     core.info('Checking diff');
                     allowedPropsChanges = Object.keys(diff.updated).every(function (prop) {
                         return (['dependencies', 'devDependencies'].includes(prop) &&
-                            typeof diff.updated[prop] === 'object');
+                            diff.updated[prop] &&
+                            typeof diff.updated[prop] === 'object' &&
+                            !Array.isArray(diff.updated[prop]));
                     });
                     if (!!allowedPropsChanges) return [3 /*break*/, 13];
                     core.error('Unexpected property change');
