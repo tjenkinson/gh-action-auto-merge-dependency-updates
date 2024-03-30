@@ -47,6 +47,9 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+    concurrency:
+      group: 'auto-merge-dependency-updates:${{ github.head_ref }}'
+      cancel-in-progress: true
     steps:
       - uses: tjenkinson/gh-action-auto-merge-dependency-updates@v1
         with:
