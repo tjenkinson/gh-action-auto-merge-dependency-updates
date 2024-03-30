@@ -21,5 +21,14 @@ jobs:
           npm ci
           npm run lint
           npm run build
-        env:
-          CI: true
+      - name: check no diff
+        run: |
+          diff_files=$(git diff)
+          if [[ -n "$diff_files" ]]; then
+            echo "Diff:"
+            echo ""
+            echo "$diff_files"
+            echo ""
+            echo "Please run 'npm run build' locally and commit changes."
+            exit 1
+          fi
