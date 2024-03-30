@@ -454,7 +454,9 @@ export async function run(): Promise<Result> {
   const allowedPropsChanges = Object.keys(diff.updated).every((prop) => {
     return (
       ['dependencies', 'devDependencies'].includes(prop) &&
-      typeof diff.updated[prop] === 'object'
+      diff.updated[prop] &&
+      typeof diff.updated[prop] === 'object' &&
+      !Array.isArray(diff.updated[prop])
     );
   });
   if (!allowedPropsChanges) {
