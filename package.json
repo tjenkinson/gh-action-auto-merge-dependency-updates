@@ -26,7 +26,7 @@
     "@octokit/graphql": "^8.0.1",
     "@octokit/plugin-throttling": "^9.0.3",
     "@octokit/webhooks": "^13.1.1",
-    "@types/node": "^20.11.30",
+    "@types/node": "^22.4.2",
     "@types/semver": "^7.5.8",
     "@vercel/ncc": "^0.38.1",
     "deep-object-diff": "^1.1.9",
